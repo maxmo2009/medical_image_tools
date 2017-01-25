@@ -19,8 +19,8 @@ import math
 
 
 
-label = np.load('../labels.npy').astype(np.int32)
-data = np.load('../datas.npy').astype(np.float32)
+label = np.load('../data/labels.npy').astype(np.int32)
+data = np.load('../data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
@@ -40,8 +40,9 @@ SDMmap_train = get_SDMmap(l_train)
 dialited_label_mask = generate_mask(l_train,offset = 15)
 SDMmap_gradient = get_gradient_SDMmap(SDMmap_train)
 
-
-
+plt.imshow(dialited_label_mask,cmap = 'gray',interpolation = 'nearest')
+plt.show()
+exit()
 points_list =  iterate_mask(dialited_label_mask)
 
 
@@ -57,8 +58,8 @@ print test_patch.shape
 print test_vecs.shape
 
 
-np.save('data/patches_SDM_train.npy', test_patch)
-np.save('data/vecs_SDM_train.npy', test_vecs)
+# np.save('data/patches_SDM_train.npy', test_patch)
+# np.save('data/vecs_SDM_train.npy', test_vecs)
 
 
 

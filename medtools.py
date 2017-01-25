@@ -14,6 +14,7 @@ from math import sqrt
 from math import pi
 from math import *
 from scipy import ndimage
+from skimage import measure
 import skfmm
 
 # from scipy.interpolate import splprep, splev
@@ -67,6 +68,26 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
   return f
 
 
+
+def generate_psedu_points(label,k = 30):
+  e = 15 
+  selem = disk(e)
+  dilated_label = dilation(label, selem)
+  dd_label = ndimage.binary_fill_holes(dilated_label).astype(int)
+  contours_label = measure.find_contours(dd_label, 0.8)
+
+  p_l = np.array(contours_label)
+  p_l = p_l[0,:,:]
+  
+  p_l[:,[0,1]] = p_l[:,[1,0]]
+
+  print p_l
+
+  keep_index_train = []
+  for i in range(0,len(p_l),k):
+    keep_index_train.append(i)
+  p_l = p_l[keep_index_train]
+  return p_l
 
 
 def rotate_vector(vec,an):#take degree(0-360) not radis(0-2pi), rotate single vector
@@ -151,10 +172,11 @@ def get_norm_by_spline_first_derivitive(points,angle =True):
   norm_in = []
   
   for item in xy:
+
     norm_out.append(l2_norm((item[1],-item[0])))
     norm_in.append(l2_norm((-item[1],item[0])))
 
-  return norm_out #size of 8
+  return norm_in #size of 8
   
 def normListToAngelList(norm):
   an_l = []
