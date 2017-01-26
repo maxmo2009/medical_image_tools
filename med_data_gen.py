@@ -40,9 +40,9 @@ SDMmap_train = get_SDMmap(l_train)
 dialited_label_mask = generate_mask(l_train,offset = 15)
 SDMmap_gradient = get_gradient_SDMmap(SDMmap_train)
 
-plt.imshow(dialited_label_mask,cmap = 'gray',interpolation = 'nearest')
+plt.imshow(SDMmap_train,cmap = 'gray',interpolation = 'nearest')
 plt.show()
-exit()
+
 points_list =  iterate_mask(dialited_label_mask)
 
 
@@ -50,16 +50,18 @@ points_list =  iterate_mask(dialited_label_mask)
 
 test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_gradient,points_list) # negatative Y toward norm!!!!!!!
 
-plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
-plt.show()
-print test_vecs[101]
-print "---------"
-print test_patch.shape
-print test_vecs.shape
 
 
-# np.save('data/patches_SDM_train.npy', test_patch)
-# np.save('data/vecs_SDM_train.npy', test_vecs)
+# plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
+# plt.show()
+# print test_vecs[101]
+# print "---------"
+# print test_patch.shape
+# print test_vecs.shape
+
+
+np.save('../data/patches_SDM_train.npy', test_patch)
+np.save('../data/vecs_SDM_train.npy', test_vecs)
 
 
 

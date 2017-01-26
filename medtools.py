@@ -243,7 +243,8 @@ def get_SDMmap(img): #take l_train as input
   filled_reverted_l_train = 1 - ndimage.binary_fill_holes(img).astype(int) #[1,1,1,0,0,0,1,1,1]
   filled_reverted_l_train[filled_reverted_l_train == 0] = -1
   dis = skfmm.distance(filled_reverted_l_train,dx = 1)
-  return dis
+
+  return np.absolute(dis)
 
 
 def get_gradient_SDMmap(SDMmap):
