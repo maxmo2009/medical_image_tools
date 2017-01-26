@@ -27,8 +27,8 @@ print data.shape
 
 data,label = remove_empty_label(data,label)
     
-d_train = data[0:250,:,:,0]
-l_train = label[0:250,:,:,0]
+d_train = data[5:6,:,:,0]
+l_train = label[5:6,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
@@ -36,29 +36,26 @@ print "---------TRAINING---------"
 print d_train.shape
 print l_train.shape
 
+f_p = np.empty([1,64,64])
+f_v = np.empty([1,2,2])
 
-
-for d,l in d_train,l_train:
+for d,l in zip(d_train,l_train):
+  print d.shape
+  print l.shape
   
-
-
-
-SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l_train)
-dialited_label_mask = generate_mask(l_train,offset = 15)
-SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
-SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
+  SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l)
+  dialited_label_mask = generate_mask(l,offset = 15)
+  SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
+  SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
 
 # plt.imshow(SDMmap_gradient,cmap = 'gray',interpolation = 'nearest')
 # plt.show()
 
-points_list =  iterate_mask(dialited_label_mask)
+  points_list =  iterate_mask(dialited_label_mask)
 
-
-
-
-test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
-
-
+  test_patch, test_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
+  print test_patch.shape
+  
 
 # plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
 # plt.show()
