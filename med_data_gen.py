@@ -10,11 +10,12 @@ import math
 
 
 # a = np.array([[0,0,1,0,0],
-# 	          [0,0,1,0,0],
-# 	          [0,0,1,0,0],
-# 	          [0,1,1,1,0],
-# 	          [0,0,0,0,0]])
+# 	          [0,0,2,0,0],
+# 	          [0,0,3,0,0],
+# 	          [0,1,4,1,0],
+# 	          [0,0,5,0,0]])
 
+# a = np.delete(a, [0,2,4], 0)
 
 
 
@@ -24,20 +25,17 @@ data = np.load('../data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
-for i in label[:,:,:,0]:
-  print np.sum(i)
-
-
-
-
-exit()
+data,label = remove_empty_label(data,label)
     
-d_train = data[6,:,:,0]
-l_train = label[6,:,:,0]
+d_train = data[0:250,:,:,0]
+l_train = label[0:250,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
  
+print d_train.shape
+print l_train.shape
+
 
 
 
@@ -66,8 +64,8 @@ test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec
 # print test_vecs.shape
 
 
-np.save('../data/patches_SDM_train.npy', test_patch)
-np.save('../data/vecs_SDM_train.npy', test_vecs)
+# np.save('../data/patches_SDM_train.npy', test_patch)
+# np.save('../data/vecs_SDM_train.npy', test_vecs)
 
 
 

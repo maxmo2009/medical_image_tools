@@ -147,10 +147,10 @@ label = np.load('../data/labels.npy').astype(np.int32)
 print "The shape of test pathes is:"
 print data.shape
 train_label = label[6,:,:,0]
-test_label = label[5,:,:,0]
+test_label = label[10,:,:,0]
 
 train_data = data[6,:,:,0]
-test_data = data[5,:,:,0]
+test_data = data[10,:,:,0]
 
 test_points = generate_psedu_points(test_label)
 test_points = test_points[:12]

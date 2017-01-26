@@ -234,7 +234,14 @@ def mean_distance(vec_1,vec_2): #inputs are two vectors lists
 
 
 def remove_empty_label(data,label):
-  for i in zip()
+  delet_list = []
+  for i in range(len(label[:,:,:,0])):
+    if np.sum(label[i,:,:,0]) == 0:
+      delet_list.append(i)
+  d = np.delete(data, delet_list,0)
+  l = np.delete(data, delet_list,0)
+  return d,l
+
 
 
 def generate_mask(label,offset = 5):
