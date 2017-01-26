@@ -32,10 +32,14 @@ l_train = label[0:250,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
- 
+print "---------TRAINING---------"
 print d_train.shape
 print l_train.shape
 
+
+
+for d,l in d_train,l_train:
+  
 
 
 
