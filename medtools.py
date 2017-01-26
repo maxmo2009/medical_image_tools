@@ -239,7 +239,7 @@ def remove_empty_label(data,label):
     if np.sum(label[i,:,:,0]) == 0:
       delet_list.append(i)
   d = np.delete(data, delet_list,0)
-  l = np.delete(data, delet_list,0)
+  l = np.delete(label, delet_list,0)
   return d,l
 
 

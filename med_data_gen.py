@@ -27,8 +27,8 @@ print data.shape
 
 data,label = remove_empty_label(data,label)
     
-d_train = data[5:6,:,:,0]
-l_train = label[5:6,:,:,0]
+d_train = data[0:20,:,:,0]
+l_train = label[0:20,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
@@ -37,7 +37,9 @@ print d_train.shape
 print l_train.shape
 
 f_p = np.empty([1,64,64])
-f_v = np.empty([1,2,2])
+f_v = np.empty([1,2])
+
+
 
 for d,l in zip(d_train,l_train):
   print d.shape
@@ -53,8 +55,13 @@ for d,l in zip(d_train,l_train):
 
   points_list =  iterate_mask(dialited_label_mask)
 
-  test_patch, test_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
-  print test_patch.shape
+  train_patch, train_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
+
+  f_p = np.append(f_p,train_patch,axis = 0)
+  f_v = np.append(f_v,train_vecs,axis = 0)
+
+print f_p.shape
+print f_v.shape
   
 
 # plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
@@ -65,8 +72,8 @@ for d,l in zip(d_train,l_train):
 # print test_vecs.shape
 
 
-# np.save('../data/patches_SDM_train.npy', test_patch)
-# np.save('../data/vecs_SDM_train.npy', test_vecs)
+np.save('../data/patches_SDM_train_large.npy', f_p)
+np.save('../data/vecs_SDM_train_large.npy', f_v)
 
 
 
