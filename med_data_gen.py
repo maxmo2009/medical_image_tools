@@ -25,10 +25,10 @@ data = np.load('../data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
-data,label = remove_empty_label(data,label)
+# data,label = remove_empty_label(data,label)
     
-d_train = data[0:250,:,:,0]
-l_train = label[0:250,:,:,0]
+d_train = data[6,:,:,0]
+l_train = label[6,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
@@ -48,10 +48,6 @@ SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
 # plt.show()
 
 points_list =  iterate_mask(dialited_label_mask)
-
-
-
-
 test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
 
 
