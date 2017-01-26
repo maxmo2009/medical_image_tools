@@ -35,6 +35,8 @@ def inner_angle(v,w):
    
 
 def angle_clockwise(A,B = (0,-1)): #norm to angle (degree)
+    if A == (0,0):
+      return 0
     inner=inner_angle(A,B)
     det = determinant(A,B)
     if det<0: #this is a property of the det. If the det < 0 then B is clockwise of A
@@ -231,7 +233,11 @@ def mean_distance(vec_1,vec_2): #inputs are two vectors lists
   return sum(dis_l)
 
 
-def generate_mask(label,offset = 15):
+def remove_empty_label(data,label):
+  for i in zip()
+
+
+def generate_mask(label,offset = 5):
   selem = disk(offset)
   filled_label = ndimage.binary_fill_holes(label).astype(int)
   diliated_filled_label = dilation(filled_label,selem)
@@ -244,7 +250,8 @@ def get_SDMmap(img): #take l_train as input
   filled_reverted_l_train[filled_reverted_l_train == 0] = -1
   dis = skfmm.distance(filled_reverted_l_train,dx = 1)
 
-  return np.absolute(dis)
+  return dis, np.absolute(dis)
+
 
 
 def get_gradient_SDMmap(SDMmap):
@@ -288,10 +295,10 @@ def iterate_mask(mask):
 
 
 
-def multipy_sample_pathch_vecs(img,cord_xy,grad_xy,dev_list):
+def multipy_sample_pathch_vecs(img,cord_xy,grad_corp_xy,grad_vec_xy,dev_list):
   x,y = cord_xy
 
-  ang = angle_clockwise(l2_norm(grad_xy))
+  ang = angle_clockwise(l2_norm(grad_corp_xy))
 
   patch_list_per_an = []
   vec_list_per_an = []
@@ -299,7 +306,7 @@ def multipy_sample_pathch_vecs(img,cord_xy,grad_xy,dev_list):
   for dev in dev_list:
     angle = ang + dev
     patch = corp(img,angle,x,y)
-    rotated_grad_vec = rotate_vector(grad_xy, 360 - angle)
+    rotated_grad_vec = rotate_vector(grad_vec_xy, 360 - angle)
     # print rotated_grad_vec
     vec_list_per_an.append(rotated_grad_vec)
     patch_list_per_an.append(patch)
@@ -307,7 +314,7 @@ def multipy_sample_pathch_vecs(img,cord_xy,grad_xy,dev_list):
 
 
 
-def corp_accdTo_mask(img,SDMmap_grad,mask_point_list):
+def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   final_patch = []
   final_vec = []
   dev_list = [-45,0,45]
@@ -320,11 +327,15 @@ def corp_accdTo_mask(img,SDMmap_grad,mask_point_list):
     dx = SDMmap_grad[y][x][0]
     dy = SDMmap_grad[y][x][1]
 
-    gradient_vec = (dx,dy) 
+    dvx = SDM_vec_grad[y][x][0]
+    dvy = SDM_vec_grad[y][x][1]
+
+    gradient_corp = (dx,dy) 
+    gradient_vec = (dvx,dvy) 
 
     
 
-    patch_list_per_cord, vec_list_per_cord = multipy_sample_pathch_vecs(img,cord,gradient_vec,dev_list)
+    patch_list_per_cord, vec_list_per_cord = multipy_sample_pathch_vecs(img,cord,gradient_corp,gradient_vec,dev_list)
     final_patch = final_patch + patch_list_per_cord
     final_vec = final_vec + vec_list_per_cord
 
