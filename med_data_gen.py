@@ -25,8 +25,11 @@ data = np.load('../data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
-# data,label = remove_empty_label(data,label)
-    
+data,label = remove_empty_label(data,label)
+print data.shape
+
+
+
 d_train = data[6,:,:,0]
 l_train = label[6,:,:,0]
 
@@ -35,7 +38,6 @@ l_train = label[6,:,:,0]
  
 print d_train.shape
 print l_train.shape
-
 
 
 
