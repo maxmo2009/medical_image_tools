@@ -78,6 +78,7 @@ print f_p.shape
 print f_v.shape
 
 
+
 np.save('../data/patches_SDM_train_small.npy', f_p)
 np.save('../data/vecs_SDM_train_small.npy', f_v)
 
