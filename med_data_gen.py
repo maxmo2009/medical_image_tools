@@ -27,8 +27,8 @@ print data.shape
 
 data,label = remove_empty_label(data,label)
     
-d_train = data[0:20,:,:,0]
-l_train = label[0:20,:,:,0]
+d_train = data[0:3,:,:,0]
+l_train = label[0:3,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
@@ -38,7 +38,6 @@ print l_train.shape
 
 f_p = np.empty([1,64,64])
 f_v = np.empty([1,2])
-
 
 
 for d,l in zip(d_train,l_train):
@@ -71,9 +70,16 @@ print f_v.shape
 # print test_patch.shape
 # print test_vecs.shape
 
+f_p = np.delete(f_p,[0],0)
 
-np.save('../data/patches_SDM_train_large.npy', f_p)
-np.save('../data/vecs_SDM_train_large.npy', f_v)
+f_v = np.delete(f_v,[0],0)
+
+print f_p.shape
+print f_v.shape
+
+
+np.save('../data/patches_SDM_train_small.npy', f_p)
+np.save('../data/vecs_SDM_train_small.npy', f_v)
 
 
 

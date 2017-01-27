@@ -19,8 +19,8 @@ import matplotlib.pyplot as plt
 # with tf.device('/gpu:0'):
 
 
-patches = np.load('../data/patches_SDM_train_large.npy').astype(np.float32)
-vecs = np.load('../data/vecs_SDM_train_large.npy').astype(np.float32)
+patches = np.load('../data/patches_SDM_train_small.npy').astype(np.float32)
+vecs = np.load('../data/vecs_SDM_train_small.npy').astype(np.float32)
 
 test_patches = np.load('../data/patches_test.npy').astype(np.float32)
 test_vecs = np.load('../data/vecs_test.npy').astype(np.float32)
@@ -37,7 +37,7 @@ tl.layers.set_name_reuse(True)
 
 n,x,y,c = patches.shape
 
-batch_size = 200
+batch_size = 1000
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
