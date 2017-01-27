@@ -19,8 +19,8 @@ import matplotlib.pyplot as plt
 # with tf.device('/gpu:0'):
 
 
-patches = np.load('../data/patches_SDM_train.npy').astype(np.float32)
-vecs = np.load('../data/vecs_SDM_train.npy').astype(np.float32)
+patches = np.load('../data/patches_SDM_train_large.npy').astype(np.float32)
+vecs = np.load('../data/vecs_SDM_train_large.npy').astype(np.float32)
 
 test_patches = np.load('../data/patches_test.npy').astype(np.float32)
 test_vecs = np.load('../data/vecs_test.npy').astype(np.float32)
@@ -37,7 +37,7 @@ tl.layers.set_name_reuse(True)
 
 n,x,y,c = patches.shape
 
-batch_size = 1000
+batch_size = 200
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
@@ -50,7 +50,7 @@ conv1=tl.layers.Conv2dLayer(network,
                        strides=[1,1,1,1],
                        padding='SAME',
                        W_init=tf.truncated_normal_initializer(stddev=0.1),
-                       b_init=tf.constant_initializer(value=0.1),
+                       b_init=tf.constant_initializer(value=0.01),
                        name='conv1')
 
 pool1=tl.layers.PoolLayer(conv1,ksize=[1, 2, 2 ,1],strides=[1,2,2,1],padding='SAME',pool=tf.nn.max_pool,name='pool1')
@@ -61,7 +61,7 @@ conv2=tl.layers.Conv2dLayer(pool1,
                         act=tf.nn.relu,shape=[3,3,32,64],
                        strides=[1,1,1,1],
                        padding='SAME',
-                       W_init=tf.truncated_normal_initializer(stddev=0.1),
+                       W_init=tf.truncated_normal_initializer(stddev=0.01),
                        b_init=tf.constant_initializer(value=0.1),
                        name='conv2')
 
@@ -71,7 +71,7 @@ conv3=tl.layers.Conv2dLayer(pool2,
                         act=tf.nn.relu,shape=[3,3,64,128],
                        strides=[1,1,1,1],
                        padding='SAME',
-                       W_init=tf.truncated_normal_initializer(stddev=0.1),
+                       W_init=tf.truncated_normal_initializer(stddev=0.01),
                        b_init=tf.constant_initializer(value=0.1),
                        name='conv3')
 
@@ -81,7 +81,7 @@ conv4=tl.layers.Conv2dLayer(pool3,
                         act=tf.nn.relu,shape=[3,3,128,256],
                        strides=[1,1,1,1],
                        padding='SAME',
-                       W_init=tf.truncated_normal_initializer(stddev=0.1),
+                       W_init=tf.truncated_normal_initializer(stddev=0.01),
                        b_init=tf.constant_initializer(value=0.1),
                        name='conv4')
 pool4=tl.layers.PoolLayer(conv4,ksize=[1, 2,2 ,1],strides=[1,2,2,1],padding='SAME',pool=tf.nn.max_pool,name='pool4')
@@ -89,13 +89,13 @@ flat1 = tl.layers.FlattenLayer(pool4, name='flatten_layer')
 dense1=tl.layers.DenseLayer(flat1,
                      n_units=2048,
                      act = tf.nn.relu,
-                     W_init=tf.truncated_normal_initializer(stddev=0.1),
+                     W_init=tf.truncated_normal_initializer(stddev=0.01),
                      name ='relu_layer'
                      )
 denseO = tl.layers.DenseLayer(dense1,
                      n_units=2,
                      act = tf.identity,
-                     W_init=tf.truncated_normal_initializer(stddev=0.1),
+                     W_init=tf.truncated_normal_initializer(stddev=0.01),
                      name ='output'
                      )
 
@@ -122,16 +122,16 @@ for i in range(2000):
   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
     
-    total_loss = total_loss + los
+    # total_loss = total_loss + los
     # print 'This is label: ', y_train
     # print 'This is predict: ', res
     # print 'This is loss: ', los
-  if i%10 == 0:
+  # if i%10 == 0:
     
-    print "EPOCH: " + str(i) + ":"
-    print "The total lose is:" + str(total_loss)
+  print "EPOCH: " + str(i) + ":"
+  print "The total lose is:" + str(los)
 
-saver.save(sess, '../models/DEEP_SNAKE_' + str(total_loss))
+saver.save(sess, '../models/DEEP_SNAKE_' + str(los))
 
 
 #####################################################################################
