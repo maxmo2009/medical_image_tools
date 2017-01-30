@@ -40,7 +40,6 @@ print d_train.shape
 print l_train.shape
 
 
-
 SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l_train)
 dialited_label_mask = generate_mask(l_train,offset = 15)
 SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
