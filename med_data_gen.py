@@ -62,8 +62,8 @@ test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec
 # print test_vecs.shape
 
 
-# np.save('../data/patches_SDM_train.npy', test_patch)
-# np.save('../data/vecs_SDM_train.npy', test_vecs)
+np.save('../data/patches_SDM_train.npy', test_patch)
+np.save('../data/vecs_SDM_train.npy', test_vecs)
 
 
 
