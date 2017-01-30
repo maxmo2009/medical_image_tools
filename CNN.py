@@ -9,13 +9,6 @@ import matplotlib.pyplot as plt
 
 
 
-
-
-
-
-
-
-
 # with tf.device('/gpu:0'):
 
 
