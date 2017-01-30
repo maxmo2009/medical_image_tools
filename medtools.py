@@ -71,7 +71,7 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 30):
+def generate_psedu_points(label,k = 10):
   e = 15 
   selem = disk(e)
   dilated_label = dilation(label, selem)
