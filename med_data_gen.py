@@ -27,6 +27,7 @@ print data.shape
 
 data,label = remove_empty_label(data,label)
 
+
     
 d_train = data[4:7,:,:,0]
 l_train = label[4:7,:,:,0]
