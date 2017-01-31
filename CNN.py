@@ -7,14 +7,7 @@ import matplotlib.pyplot as plt
 
 
 
-
-
-
-
-
-
-
-
+# 
 
 # with tf.device('/gpu:0'):
 
@@ -131,26 +124,33 @@ saver = tf.train.Saver()
 #   print "EPOCH: " + str(i) + ":"
 #   print "The total lose is:" + str(los)
 
+
 # saver.save(sess, '../models/DEEP_SNAKE_small')
+
 
 
 #####################################################################################
 
 ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
+
 saver.restore(sess, '../models/DEEP_SNAKE_small')
 ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
+
+
 
 data = np.load('../data/datas.npy').astype(np.float32)
 label = np.load('../data/labels.npy').astype(np.int32)
 
 print "The shape of test pathes is:"
 print data.shape
+
 # train_label = label[6,:,:,0]
 test_label = label[10,:,:,0]
 
 # train_data = data[6,:,:,0]
 test_data = data[10,:,:,0]
+
 
 test_points = generate_psedu_points(test_label)
 # test_points = test_points[:12]

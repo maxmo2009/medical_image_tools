@@ -26,9 +26,13 @@ print "The total number of training data is:"
 print data.shape
 
 data,label = remove_empty_label(data,label)
+
     
 d_train = data[4:7,:,:,0]
 l_train = label[4:7,:,:,0]
+
+print data.shape
+
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
@@ -40,6 +44,7 @@ f_p = np.empty([1,64,64])
 f_v = np.empty([1,2])
 
 
+
 for d,l in zip(d_train,l_train):
   print d.shape
   print l.shape
@@ -49,12 +54,15 @@ for d,l in zip(d_train,l_train):
   SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
   SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
 
+
 # plt.imshow(SDMmap_gradient,cmap = 'gray',interpolation = 'nearest')
 # plt.show()
+
 
   points_list =  iterate_mask(dialited_label_mask)
 
   train_patch, train_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
+
 
   f_p = np.append(f_p,train_patch,axis = 0)
   f_v = np.append(f_v,train_vecs,axis = 0)
@@ -79,8 +87,11 @@ print f_v.shape
 
 
 
+
 np.save('../data/patches_SDM_train_4_7.npy', f_p)
 np.save('../data/vecs_SDM_train_4_7.npy', f_v)
+
+
 
 
 
