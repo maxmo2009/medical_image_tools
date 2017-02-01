@@ -4,4 +4,5 @@ Deep Active Contour
 2. Use CNN.py to learning, store the models. 
 3. core functions are stored in medtools.py
 Dependencies:
-------
+====
+Numpy,Scipy,skimage,matplotlib,Tensorflow,Tensorlayer
