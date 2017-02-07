@@ -17,11 +17,11 @@ import math
 
 # a = np.delete(a, [0,2,4], 0)
 
+data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
-
-label = np.load('../data/labels.npy').astype(np.int32)
-data = np.load('../data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
@@ -29,8 +29,8 @@ data,label = remove_empty_label(data,label)
 
 
     
-d_train = data[4:7,:,:,0]
-l_train = label[4:7,:,:,0]
+d_train = data[4:8,:,:,0]
+l_train = label[4:8,:,:,0]
 
 print data.shape
 
@@ -89,8 +89,8 @@ print f_v.shape
 
 
 
-np.save('../data/patches_SDM_train_4_7.npy', f_p)
-np.save('../data/vecs_SDM_train_4_7.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_4_8.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_4_8.npy', f_v)
 
 
 
