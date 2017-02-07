@@ -2,8 +2,6 @@
 # greedy based Active Contour Model
 # 
 
-
-
 import numpy as np 
 import matplotlib.pyplot as plt
 from skimage.draw import circle,polygon
