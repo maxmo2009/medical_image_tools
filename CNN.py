@@ -7,20 +7,20 @@ import matplotlib.pyplot as plt
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-
+model_n = '4_8'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_small.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_small.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_4_8.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_4_8.npy').astype(np.float32)
 
-test_patches = np.load('../data/patches_test.npy').astype(np.float32)
-test_vecs = np.load('../data/vecs_test.npy').astype(np.float32)
+# test_patches = np.load('../data/patches_test.npy').astype(np.float32)
+# test_vecs = np.load('../data/vecs_test.npy').astype(np.float32)
 
 patches = patches[:,:,:,np.newaxis]
-test_patches = test_patches[:,:,:,np.newaxis]
+# test_patches = test_patches[:,:,:,np.newaxis]
 
 print patches.shape
 print vecs.shape
