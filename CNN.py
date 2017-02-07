@@ -3,7 +3,7 @@ import tensorlayer as tl
 import numpy as np
 from medtools import *
 import matplotlib.pyplot as plt
-
+import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
@@ -16,8 +16,8 @@ model_n = '4_8'
 patches = np.load(data_p + '/train_data/patches_SDM_train_4_8.npy').astype(np.float32)
 vecs = np.load(data_p + '/train_data/vecs_SDM_train_4_8.npy').astype(np.float32)
 
-# test_patches = np.load('../data/patches_test.npy').astype(np.float32)
-# test_vecs = np.load('../data/vecs_test.npy').astype(np.float32)
+# test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
+# test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
 patches = patches[:,:,:,np.newaxis]
 # test_patches = test_patches[:,:,:,np.newaxis]
@@ -110,24 +110,27 @@ saver = tf.train.Saver()
 
 
 #################################################################################
-for i in range(2000):
-  total_loss = 0
+# start_time = time.time()
+# for i in range(2000):
+#   total_loss = 0
  
-  for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
-    _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
+#   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
+#     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
     
-    # total_loss = total_loss + los
-    # print 'This is label: ', y_train
-    # print 'This is predict: ', res
-    # print 'This is loss: ', los
-  # if i%10 == 0:
+#     # total_loss = total_loss + los
+#     # print 'This is label: ', y_train
+#     # print 'This is predict: ', res
+#     # print 'This is loss: ', los
+#   # if i%10 == 0:
     
-  print "EPOCH: " + str(i) + ":"
-  print "The total lose is:" + str(los)
+#   print "EPOCH: " + str(i) + ":"
+#   print "The total lose is:" + str(los)
 
 
-saver.save(sess, '../models/DEEP_SNAKE_small')
-
+# saver.save(sess, '../models/DEEP_SNAKE_' + model_n)
+# elapsed_time = time.time() - start_time
+# print "time last for: " 
+# print elapsed_time
 
 
 #####################################################################################
@@ -135,47 +138,47 @@ saver.save(sess, '../models/DEEP_SNAKE_small')
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
-# saver.restore(sess, '../models/DEEP_SNAKE_small')
+saver.restore(sess, '../models/DEEP_SNAKE_small')
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-# data = np.load('../data/datas.npy').astype(np.float32)
-# label = np.load('../data/labels.npy').astype(np.int32)
+data = np.load(data_p + '/data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
 
-# print "The shape of test pathes is:"
-# print data.shape
+print "The shape of test pathes is:"
+print data.shape
 
-# # train_label = label[6,:,:,0]
-# test_label = label[10,:,:,0]
+# train_label = label[6,:,:,0]
+test_label = label[15,:,:,0]
 
-# # train_data = data[6,:,:,0]
-# test_data = data[10,:,:,0]
-
-
-# test_points = generate_psedu_points(test_label)
-# # test_points = test_points[:12]
-# print "the length of contour points is:"
-# print len(test_points)
-# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-# an_list = normListToAngelList(norm_list)
+# train_data = data[6,:,:,0]
+test_data = data[15,:,:,0]
 
 
-# for i in range(20):
-#   patch_list = []
-#   for p,an in zip(test_points,an_list):
-#     x,y = p
-#     patch = corp(test_data,an,x,y)
-#     patch_list.append(patch)
-#     # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
-#   t_p = np.array(patch_list)
-#   t_p = t_p[:,:,:,np.newaxis]
-#   ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
-#   abs_vec = rotate_vectors_list(ress,an_list)
-#   test_points = test_points + abs_vec
-#   p_m = PtToMap(test_points,test_label.shape)
-#   plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
-#   plt.show()
+test_points = generate_psedu_points(test_label)
+# test_points = test_points[:12]
+print "the length of contour points is:"
+print len(test_points)
+norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+an_list = normListToAngelList(norm_list)
+
+
+for i in range(20):
+  patch_list = []
+  for p,an in zip(test_points,an_list):
+    x,y = p
+    patch = corp(test_data,an,x,y)
+    patch_list.append(patch)
+    # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
+  t_p = np.array(patch_list)
+  t_p = t_p[:,:,:,np.newaxis]
+  ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
+  abs_vec = rotate_vectors_list(ress,an_list)
+  test_points = test_points + abs_vec
+  p_m = PtToMap(test_points,test_label.shape)
+  plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
+  plt.show()
 
 
 
