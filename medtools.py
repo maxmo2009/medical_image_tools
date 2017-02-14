@@ -351,6 +351,47 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
 
   return np.array(final_patch), np.array(final_vec)
 
+def get_limited_circle_gradient_SDMmap(label,ee=15):
+  e = ee
+  selem = disk(e)
+  filled_label = ndimage.binary_fill_holes(label).astype(int)
+  contours_label = measure.find_contours(filled_label, 0.8)
+ 
+  p_l = np.array(contours_label)
+  p_l = p_l[0,:,:]
+
+  p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
+
+  mask_label_contour = dilation(PtToMap(p_l,(288,288)), selem)
+
+  inner_mask = mask_label_contour*filled_label
+  out_mask =  mask_label_contour - inner_mask
+  label_SDM, label_abs_SDM = get_SDMmap(label)
+  gradient = get_gradient_SDMmap(label_abs_SDM)
+  scale_label_abs_SDM = (mask_label_contour*label_abs_SDM)/(mask_label_contour*label_abs_SDM).max()
+  print label_abs_SDM.max()
+  for i in range(len(out_mask)):#iterate over Y row
+    for j in range(len(out_mask[i])):#iterate over X 
+      if out_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  for i in range(len(inner_mask)):#iterate over Y row
+    for j in range(len(inner_mask[i])):#iterate over X 
+      if inner_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*-90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  return gradient
+
 
 
 # a = np.array([[0,0,0,0,0],
