@@ -9,18 +9,91 @@ from skimage import measure
 import numpy as np
 import matplotlib.pyplot as plt
 
+# a = np.array([[1,1,1,1],
+# 	          [2,2,2,2],
+# 	          [1,1,0,1],
+# 	          [2,2,2,2]])
 
-X, Y = np.meshgrid(np.linspace(-1,1,50), np.linspace(-1,1,50))
-phi = (X+0.8)**2+(Y+0.8)**2 - 0.01
 
-speed = 1+X**2+Y**2
-
-# d = skfmm.distance(phi, dx=2.0/500, periodic=True)
-CS = plt.contour(X, Y, phi)
-print CS.collections[0]
-# plt.imshow(d)
-
+# plt.imshow(a)
 # plt.show()
+# exit()
+
+
+def get_limited_circle_gradient_SDMmap(label):
+  e = 40
+  selem = disk(e)
+  filled_label = ndimage.binary_fill_holes(label).astype(int)
+  contours_label = measure.find_contours(filled_label, 0.8)
+ 
+  p_l = np.array(contours_label)
+  p_l = p_l[0,:,:]
+
+  p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
+
+  mask_label_contour = dilation(PtToMap(p_l,(288,288)), selem)
+
+  inner_mask = mask_label_contour*filled_label
+  out_mask =  mask_label_contour - inner_mask
+  label_SDM, label_abs_SDM = get_SDMmap(label)
+  gradient = get_gradient_SDMmap(label_abs_SDM)
+  scale_label_abs_SDM = (mask_label_contour*label_abs_SDM)/(mask_label_contour*label_abs_SDM).max()
+  print label_abs_SDM.max()
+  for i in range(len(out_mask)):#iterate over Y row
+    for j in range(len(out_mask[i])):#iterate over X 
+      if out_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  for i in range(len(inner_mask)):#iterate over Y row
+    for j in range(len(inner_mask[i])):#iterate over X 
+      if inner_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*-90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  return gradient
+
+data_p = '/media/dsigpu5/SSD/YUANHAN/data'
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
+
+single_data = data[8,:,:,0]
+single_lable = label[8,:,:,0]
+
+
+
+g = get_limited_circle_gradient_SDMmap(single_lable)
+U = g[:,:,0]
+V = g[:,:,1]
+Y, X = np.mgrid[-1:1:288j, -1:1:288j]
+
+# plt.imshow(get_limited_circle_gradient_SDMmap(single_lable))
+fig0, ax0 = plt.subplots()
+
+strm = ax0.streamplot(X, Y, U, V, color=U,density=15, linewidth=0.5, cmap=plt.cm.autumn)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 exit()
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 label = np.load(data_p + '/data/labels.npy').astype(np.int32)

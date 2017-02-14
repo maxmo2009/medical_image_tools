@@ -72,9 +72,9 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 10):
+def generate_psedu_points(label,k = 10,ee = 15): #ee: how far is going to dialiated. k: distance between each point
 
-  e = 15 
+  e = ee
   selem = disk(e)
   dilated_label = dilation(label, selem)
   dd_label = ndimage.binary_fill_holes(dilated_label).astype(int)
@@ -85,7 +85,7 @@ def generate_psedu_points(label,k = 10):
   
   p_l[:,[0,1]] = p_l[:,[1,0]]
 
-  print p_l
+  # print p_l
 
   keep_index_train = []
   for i in range(0,len(p_l),k):
@@ -94,14 +94,14 @@ def generate_psedu_points(label,k = 10):
   return p_l
 
 
-def rotate_vector(vec,an):#take degree(0-360) not radis(0-2pi), rotate single vector
+def rotate_vector(vec,an):#take degree(0-360) not radis(0-2pi), rotate single vector (x,y)
 
   ang = pi * an / 180
   x = vec[0]*cos(ang) - vec[1]*sin(ang)
   y = vec[0]*sin(ang) + vec[1]*cos(ang)
   return (x,y)
 
-def rotate_vectors_list(vecs,an):#take degree(0-360) not radis(0-2pi), rotate a vecs list with an angel list
+def rotate_vectors_list(vecs,an):#take degree(0-360) not radis(0-2pi), rotate a vecs list with an angel list!!!
 
   new_l = []
   for i,j in zip(vecs,an):
