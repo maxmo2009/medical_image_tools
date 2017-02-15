@@ -17,41 +17,60 @@ import math
 
 # a = np.delete(a, [0,2,4], 0)
 
+data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
-
-label = np.load('../data/labels.npy').astype(np.int32)
-data = np.load('../data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
 data,label = remove_empty_label(data,label)
+
+
+    
+d_train = data[4:8,:,:,0]
+l_train = label[4:8,:,:,0]
+
 print data.shape
 
 
-
-d_train = data[6,:,:,0]
-l_train = label[6,:,:,0]
-
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
- 
+print "---------TRAINING---------"
 print d_train.shape
 print l_train.shape
 
+f_p = np.empty([1,64,64])
+f_v = np.empty([1,2])
 
-SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l_train)
-dialited_label_mask = generate_mask(l_train,offset = 15)
-SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
-SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
+
+
+for d,l in zip(d_train,l_train):
+  print d.shape
+  print l.shape
+  
+  SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l)
+  dialited_label_mask = generate_mask(l,offset = 15)
+  SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
+  SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
+
 
 # plt.imshow(SDMmap_gradient,cmap = 'gray',interpolation = 'nearest')
 # plt.show()
 
-points_list =  iterate_mask(dialited_label_mask)
-test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
+
+  points_list =  iterate_mask(dialited_label_mask)
+
+  train_patch, train_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
 
 
+  f_p = np.append(f_p,train_patch,axis = 0)
+  f_v = np.append(f_v,train_vecs,axis = 0)
+
+print f_p.shape
+print f_v.shape
+  
 
 # plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
 # plt.show()
@@ -60,9 +79,20 @@ test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec
 # print test_patch.shape
 # print test_vecs.shape
 
+f_p = np.delete(f_p,[0],0)
 
-np.save('../data/patches_SDM_train.npy', test_patch)
-np.save('../data/vecs_SDM_train.npy', test_vecs)
+f_v = np.delete(f_v,[0],0)
+
+print f_p.shape
+print f_v.shape
+
+
+
+
+np.save(data_p + '/train_data/patches_SDM_train_4_8.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_4_8.npy', f_v)
+
+
 
 
 
