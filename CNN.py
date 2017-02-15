@@ -31,7 +31,7 @@ tl.layers.set_name_reuse(True)
 
 n,x,y,c = patches.shape
 
-batch_size = 1000
+batch_size = 128
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
@@ -150,13 +150,13 @@ print "The shape of test pathes is:"
 print data.shape
 
 # train_label = label[6,:,:,0]
-test_label = label[5,:,:,0]
+test_label = label[6,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[5,:,:,0]
+test_data = data[6,:,:,0]
 
 
-test_points = generate_psedu_points(test_label,k=30)
+test_points = generate_psedu_points(test_label,k=5)
 # test_points = test_points[:12]
 print "the length of contour points is:"
 print len(test_points)
