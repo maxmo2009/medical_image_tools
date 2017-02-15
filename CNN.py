@@ -7,14 +7,14 @@ import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '4_8'
+model_n = '5_limitedCircle'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_4_8.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_4_8.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_5_limitedCircle.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_5_limitedCircle.npy').astype(np.float32)
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
@@ -138,7 +138,7 @@ saver = tf.train.Saver()
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
-saver.restore(sess, '../models/DEEP_SNAKE_small')
+saver.restore(sess, '../models/DEEP_SNAKE_5_limitedCircle')
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
@@ -150,13 +150,13 @@ print "The shape of test pathes is:"
 print data.shape
 
 # train_label = label[6,:,:,0]
-test_label = label[15,:,:,0]
+test_label = label[5,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[15,:,:,0]
+test_data = data[5,:,:,0]
 
 
-test_points = generate_psedu_points(test_label)
+test_points = generate_psedu_points(test_label,k=30)
 # test_points = test_points[:12]
 print "the length of contour points is:"
 print len(test_points)
@@ -164,7 +164,7 @@ norm_list = get_norm_by_spline_first_derivitive(list(test_points))
 an_list = normListToAngelList(norm_list)
 
 
-for i in range(20):
+for i in range(50):
   patch_list = []
   for p,an in zip(test_points,an_list):
     x,y = p

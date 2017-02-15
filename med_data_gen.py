@@ -29,8 +29,8 @@ data,label = remove_empty_label(data,label)
 
 
     
-d_train = data[5:6:,:,0]
-l_train = label[5:6:,:,0]
+d_train = data[5:6,:,:,0]
+l_train = label[5:6,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
