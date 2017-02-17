@@ -150,13 +150,13 @@ print "The shape of test pathes is:"
 print data.shape
 
 # train_label = label[6,:,:,0]
-test_label = label[6,:,:,0]
+test_label = label[7,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[6,:,:,0]
+test_data = data[7,:,:,0]
 
 
-test_points = generate_psedu_points(test_label,k=5)
+test_points = generate_psedu_points(test_label)
 # test_points = test_points[:12]
 print "the length of contour points is:"
 print len(test_points)
@@ -165,6 +165,7 @@ an_list = normListToAngelList(norm_list)
 
 
 for i in range(50):
+  
   patch_list = []
   for p,an in zip(test_points,an_list):
     x,y = p
@@ -177,8 +178,56 @@ for i in range(50):
   abs_vec = rotate_vectors_list(ress,an_list)
   test_points = test_points + abs_vec
   p_m = PtToMap(test_points,test_label.shape)
+  norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+  an_list = normListToAngelList(norm_list)
   plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
   plt.show()
+exit()
+########################previous_gradient#############################
+
+saver.restore(sess, '../models/DEEP_SNAKE_5_limitedCircle')
+# ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
+data = np.load(data_p + '/data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+
+print "The shape of test pathes is:"
+print data.shape
+
+# train_label = label[6,:,:,0]
+test_label = label[7,:,:,0]
+
+# train_data = data[6,:,:,0]
+test_data = data[7,:,:,0]
+
+
+test_points = generate_psedu_points(test_label)
+# test_points = test_points[:12]
+print "the length of contour points is:"
+print len(test_points)
+norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+an_list = normListToAngelList(norm_list)
+
+
+for i in range(50):
+    
+
+
+  patch_list = []
+  for p,an in zip(test_points,an_list):
+    x,y = p
+    patch = corp(test_data,an,x,y)
+    patch_list.append(patch)
+    # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
+  t_p = np.array(patch_list)
+  t_p = t_p[:,:,:,np.newaxis]
+  ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
+  abs_vec = rotate_vectors_list(ress,an_list)
+  test_points = test_points + abs_vec
+  p_m = PtToMap(test_points,test_label.shape)
+  norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+  an_list = normListToAngelList(norm_list)
+  plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
+  plt.show()

@@ -72,7 +72,7 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 10,ee = 15): #ee: how far is going to dialiated. k: distance between each point
+def generate_psedu_points(label,k = 30,ee = 10): #ee: how far is going to dialiated. k: distance between each point
 
   e = ee
   selem = disk(e)
@@ -170,12 +170,12 @@ def get_norm_by_spline_first_derivitive(points,angle =True):
 
   D1_mash = np.linspace(u.min(), u.max(), 1000)
   xy = splev(u, tck, der=1) #produce dy and dx
-  xy = np.array(xy).T
+  xy_T = np.array(xy).T
 
   norm_out = []
   norm_in = []
   
-  for item in xy:
+  for item in xy_T:
 
     norm_out.append(l2_norm((item[1],-item[0])))
     norm_in.append(l2_norm((-item[1],item[0])))
@@ -223,6 +223,9 @@ def l2_norm(vec):
   dx,dy = vec
   mag = np.linalg.norm(vec)
   return (dx/mag,dy/mag)
+
+def l2_norm_list(vec_list):
+  
 
 def mean_distance(vec_1,vec_2): #inputs are two vectors lists
   dis_l = []
@@ -326,7 +329,7 @@ def multipy_sample_pathch_vecs(img,cord_xy,grad_corp_xy,grad_vec_xy,dev_list):
 def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   final_patch = []
   final_vec = []
-  dev_list = [-45,0,45]
+  dev_list = [-30,15,0,15,30]
   print "the length of the mask_point_list is " + str(len(mask_point_list))
   i = 0
   for cord in mask_point_list: #cord = (x,y)

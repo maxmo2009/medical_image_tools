@@ -32,8 +32,8 @@ data,label = remove_empty_label(data,label)
 
 
     
-d_train = data[1:20,:,:,0]
-l_train = label[1:20,:,:,0]
+d_train = data[5:6,:,:,0]
+l_train = label[5:6,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
@@ -54,7 +54,7 @@ for d,l in zip(d_train,l_train):
   print l.shape
   
   SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l)
-  dialited_label_mask = generate_mask(l,offset = 15)
+  dialited_label_mask = generate_mask(l,offset = 10)
   SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
   SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(l)
 
@@ -92,8 +92,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_1_200_limitedCircle.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_1_200_limitedCircle.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_5_limitedCircle.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_5_limitedCircle.npy', f_v)
 
 
 
