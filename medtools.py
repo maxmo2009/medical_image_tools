@@ -72,7 +72,7 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 30,ee = 10): #ee: how far is going to dialiated. k: distance between each point
+def generate_psedu_points(label,k = 15,ee = 10): #ee: how far is going to dialiated. k: distance between each point
 
   e = ee
   selem = disk(e)
@@ -224,8 +224,8 @@ def l2_norm(vec):
   mag = np.linalg.norm(vec)
   return (dx/mag,dy/mag)
 
-def l2_norm_list(vec_list):
-  
+def l2_norm_list(vec_list): 
+  pass
 
 def mean_distance(vec_1,vec_2): #inputs are two vectors lists
   dis_l = []
