@@ -329,11 +329,11 @@ def multipy_sample_pathch_vecs(img,cord_xy,grad_corp_xy,grad_vec_xy,dev_list):
 def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   final_patch = []
   final_vec = []
-  dev_list = [-30,15,0,15,30]
+  dev_list = [-45,0,45]
   print "the length of the mask_point_list is " + str(len(mask_point_list))
   i = 0
   for cord in mask_point_list: #cord = (x,y)
-    print i
+    # print i
     i = i + 1
     x,y = cord
     dx = SDMmap_grad[y][x][0]
@@ -361,6 +361,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=15):
   contours_label = measure.find_contours(filled_label, 0.8)
  
   p_l = np.array(contours_label)
+  print "Contour's shape is",p_l.shape
   p_l = p_l[0,:,:]
 
   p_l[:,[0,1]] = p_l[:,[1,0]] # rotate

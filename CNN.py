@@ -7,14 +7,14 @@ import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '5_10_limitedCircle'
+model_n = '1_30_cleans_limitedCircle'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_5_10_limitedCircle.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_5_10_limitedCircle.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle.npy').astype(np.float32)
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
@@ -123,11 +123,15 @@ saver = tf.train.Saver()
 #     # print 'This is loss: ', los
 #   # if i%10 == 0:
     
-#   print "EPOCH: " + str(i) + ":"
+#   print "EPOCH: " + str(i) + ":" 
 #   print "The total lose is:" + str(los)
+#   if i%50 == 0:
+#     saver.save(sess, '../models/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+#   if los <= 0.4:
+#     break
 
 
-# saver.save(sess, '../models/DEEP_SNAKE_' + model_n)
+# saver.save(sess, '../models/final_DEEP_SNAKE_' + model_n)
 # elapsed_time = time.time() - start_time
 # print "time last for: " 
 # print elapsed_time
@@ -138,31 +142,32 @@ saver = tf.train.Saver()
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
-saver.restore(sess, '../models/DEEP_SNAKE_5_10_limitedCircle')
+
 # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-data = np.load(data_p + '/data/datas.npy').astype(np.float32)
-label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
 print "The shape of test pathes is:"
 print data.shape
 
 # train_label = label[6,:,:,0]
-test_label = label[12,:,:,0]
+test_label = label[35,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[12,:,:,0]
+test_data = data[35,:,:,0]
 
-
+saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
 test_points = generate_psedu_points(test_label)
 # test_points = test_points[:12]
 print "the length of contour points is:"
 print len(test_points)
 norm_list = get_norm_by_spline_first_derivitive(list(test_points))
 an_list = normListToAngelList(norm_list)
-
+plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+plt.show()
 
 for i in range(50):
   

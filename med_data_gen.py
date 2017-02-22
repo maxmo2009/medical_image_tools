@@ -23,19 +23,25 @@ import math
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
-label = np.load(data_p + '/data/labels.npy').astype(np.int32)
-data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
+data = np.load(data_p +  '/data/clean_datas.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
-data,label = remove_empty_label(data,label)
+# data,label = remove_empty_label(data,label)
 
 
     
-d_train = data[5:10,:,:,0]
-l_train = label[5:10,:,:,0]
+d_train = data[1:30,:,:,0]
+l_train = label[1:30,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
+
+for d in l_train:
+  plt.imshow(d)
+  plt.show()
+
+
 
 
 # d_test = data[11,:,:,0]
@@ -47,17 +53,19 @@ print l_train.shape
 f_p = np.empty([1,64,64])
 f_v = np.empty([1,2])
 
-
-
+print "--------ENDS---------"
+it = 0
+print "--------start generating patches------"
 for d,l in zip(d_train,l_train):
+  print "current offset is:", it
   print d.shape
   print l.shape
   
   SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l)
-  dialited_label_mask = generate_mask(l,offset = 10)
+  dialited_label_mask = generate_mask(l,offset = 15)
   SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
   SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(l)
-
+  
 
 # plt.imshow(SDMmap_gradient,cmap = 'gray',interpolation = 'nearest')
 # plt.show()
@@ -70,7 +78,7 @@ for d,l in zip(d_train,l_train):
 
   f_p = np.append(f_p,train_patch,axis = 0)
   f_v = np.append(f_v,train_vecs,axis = 0)
-
+  it = it + 1
 print f_p.shape
 print f_v.shape
   
@@ -92,8 +100,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_5_10_limitedCircle.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_5_10_limitedCircle.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle.npy', f_v)
 
 
 

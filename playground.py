@@ -8,7 +8,7 @@ from scipy import ndimage
 from skimage import measure
 import numpy as np
 import matplotlib.pyplot as plt
-
+from medpy.io import load
 # a = np.array([[1,1,1,1],
 # 	          [2,2,2,2],
 # 	          [1,1,0,1],
@@ -84,13 +84,16 @@ import matplotlib.pyplot as plt
 
 
 
+path = "/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/challenge_training/SC-HF-I-1/IM-0002-0009.dcm"
 
 
 
+image_data, image_header = load(path)
+print image_data.shape
+plt.imshow(image_data)
+plt.show()
 
-
-
-
+exit()
 
 
 
