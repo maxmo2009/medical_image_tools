@@ -7,14 +7,14 @@ import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '1_30_cleans_limitedCircle'
+model_n = '5_6_cleans_limitedCircle_PreSin'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_5_6_limitedCircle_preSin.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_5_6_limitedCircle_preSin.npy').astype(np.float32)
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
@@ -31,7 +31,7 @@ tl.layers.set_name_reuse(True)
 
 n,x,y,c = patches.shape
 
-batch_size = 512
+batch_size = 128
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
@@ -125,12 +125,12 @@ saver = tf.train.Saver()
 #   print "EPOCH: " + str(i) + ":" 
 #   print "The total lose is:" + str(los)
 #   if i%50 == 0:
-#     saver.save(sess, '../models/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+#     saver.save(sess, '../models/presin/DEEP_SNAKE_' + model_n + '_at_' + str(los))
 #   if los <= 0.4:
 #     break
 
 
-# saver.save(sess, '../models/final_DEEP_SNAKE_' + model_n)
+# saver.save(sess, '../models/presin/final_DEEP_SNAKE_' + model_n)
 # elapsed_time = time.time() - start_time
 # print "time last for: " 
 # print elapsed_time
@@ -141,56 +141,56 @@ saver = tf.train.Saver()
 
 
 
-data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
-label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
+# data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
+# label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
-print "The shape of test pathes is:"
-print data.shape
+# print "The shape of test pathes is:"
+# print data.shape
 
-# train_label = label[6,:,:,0]
-test_label = label[28,:,:,0]
+# # train_label = label[6,:,:,0]
+# test_label = label[28,:,:,0]
 
-# train_data = data[6,:,:,0]
-test_data = data[28,:,:,0]
+# # train_data = data[6,:,:,0]
+# test_data = data[28,:,:,0]
+
+# saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
+# test_points = generate_psedu_points(test_label)
+# # test_points = test_points[:12]
+# print "the length of contour points is:"
+# print len(test_points)
+# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+# an_list = normListToAngelList(norm_list)
+# plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+# plt.show()
+
+# for i in range(50):
+  
+#   patch_list = []
+#   for p,an in zip(test_points,an_list):
+#     x,y = p
+#     patch = corp(test_data,an,x,y)
+#     patch_list.append(patch)
+#     # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
+#   t_p = np.array(patch_list)
+#   t_p = t_p[:,:,:,np.newaxis]
+#   ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
+#   abs_vec = rotate_vectors_list(ress,an_list)
+#   test_points = test_points + abs_vec
+#   p_m = PtToMap(test_points,test_label.shape)
+#   norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+#   an_list = normListToAngelList(norm_list)
+#   plt.imshow(p_m + test_data,cmap = 'gray',interpolation = 'nearest')
+#   plt.show()
+# exit()
+# ########################previous_gradient_single_point#############################
 
 saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
-test_points = generate_psedu_points(test_label)
-# test_points = test_points[:12]
-print "the length of contour points is:"
-print len(test_points)
-norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-an_list = normListToAngelList(norm_list)
-plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
-plt.show()
-
-for i in range(50):
-  
-  patch_list = []
-  for p,an in zip(test_points,an_list):
-    x,y = p
-    patch = corp(test_data,an,x,y)
-    patch_list.append(patch)
-    # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
-  t_p = np.array(patch_list)
-  t_p = t_p[:,:,:,np.newaxis]
-  ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
-  abs_vec = rotate_vectors_list(ress,an_list)
-  test_points = test_points + abs_vec
-  p_m = PtToMap(test_points,test_label.shape)
-  norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-  an_list = normListToAngelList(norm_list)
-  plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
-  plt.show()
-exit()
-# ########################previous_gradient#############################
-
-# saver.restore(sess, '../models/DEEP_SNAKE_5_limitedCircle')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-# data = np.load(data_p + '/data/datas.npy').astype(np.float32)
-# label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
 # print "The shape of test pathes is:"
 # print data.shape

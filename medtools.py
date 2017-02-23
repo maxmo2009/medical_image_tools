@@ -222,6 +222,8 @@ def get_vecF_from_label_relative(points,label,ang):
 def l2_norm(vec):
   dx,dy = vec
   mag = np.linalg.norm(vec)
+  if mag == 0.0:
+    return (1,0)
   return (dx/mag,dy/mag)
 
 def l2_norm_list(vec_list): 
