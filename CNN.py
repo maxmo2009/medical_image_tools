@@ -108,7 +108,6 @@ sess.run(init)
 
 saver = tf.train.Saver()
 
-
 #################################################################################
 # start_time = time.time()
 # for i in range(2000):
@@ -139,11 +138,6 @@ saver = tf.train.Saver()
 
 #####################################################################################
 
-# ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
-
-
-
-# ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
@@ -154,10 +148,10 @@ print "The shape of test pathes is:"
 print data.shape
 
 # train_label = label[6,:,:,0]
-test_label = label[35,:,:,0]
+test_label = label[28,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[35,:,:,0]
+test_data = data[28,:,:,0]
 
 saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
 test_points = generate_psedu_points(test_label)
