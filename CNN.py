@@ -13,8 +13,8 @@ model_n = '5_6_cleans_limitedCircle_PreSin'
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_5_6_limitedCircle_preSin.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_5_6_limitedCircle_preSin.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin.npy').astype(np.float32)
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
@@ -31,7 +31,7 @@ tl.layers.set_name_reuse(True)
 
 n,x,y,c = patches.shape
 
-batch_size = 128
+batch_size = 512
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
@@ -109,88 +109,43 @@ sess.run(init)
 saver = tf.train.Saver()
 
 #################################################################################
-# start_time = time.time()
-# for i in range(2000):
-#   total_loss = 0
+start_time = time.time()
+for i in range(2000):
+  total_loss = 0
  
-#   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
-#     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
+  for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
+    _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
     
-#     # total_loss = total_loss + los
-#     # print 'This is label: ', y_train
-#     # print 'This is predict: ', res
-#     # print 'This is loss: ', los
-#   # if i%10 == 0:
+    # total_loss = total_loss + los
+    # print 'This is label: ', y_train
+    # print 'This is predict: ', res
+    # print 'This is loss: ', los
+  # if i%10 == 0:
     
-#   print "EPOCH: " + str(i) + ":" 
-#   print "The total lose is:" + str(los)
-#   if i%50 == 0:
-#     saver.save(sess, '../models/presin/DEEP_SNAKE_' + model_n + '_at_' + str(los))
-#   if los <= 0.4:
-#     break
+  print "EPOCH: " + str(i) + ":" 
+  print "The total lose is:" + str(los)
+  if i%50 == 0:
+    saver.save(sess, '../models/presin_1_30_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+  if los <= 0.5:
+    break
 
 
-# saver.save(sess, '../models/presin/final_DEEP_SNAKE_' + model_n)
-# elapsed_time = time.time() - start_time
-# print "time last for: " 
-# print elapsed_time
+saver.save(sess, '../models/presin_1_30_unreg/final_DEEP_SNAKE_' + model_n)
+elapsed_time = time.time() - start_time
+print "time last for: " 
+print elapsed_time
 
 
 #####################################################################################
+# ########################previous_gradient_single_point#############################
 
+# saver.restore(sess, '../models/presin/final_DEEP_SNAKE_5_6_cleans_limitedCircle_PreSin')
+# # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
 # data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
 # label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
-
-# print "The shape of test pathes is:"
-# print data.shape
-
-# # train_label = label[6,:,:,0]
-# test_label = label[28,:,:,0]
-
-# # train_data = data[6,:,:,0]
-# test_data = data[28,:,:,0]
-
-# saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
-# test_points = generate_psedu_points(test_label)
-# # test_points = test_points[:12]
-# print "the length of contour points is:"
-# print len(test_points)
-# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-# an_list = normListToAngelList(norm_list)
-# plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
-# plt.show()
-
-# for i in range(50):
-  
-#   patch_list = []
-#   for p,an in zip(test_points,an_list):
-#     x,y = p
-#     patch = corp(test_data,an,x,y)
-#     patch_list.append(patch)
-#     # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
-#   t_p = np.array(patch_list)
-#   t_p = t_p[:,:,:,np.newaxis]
-#   ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
-#   abs_vec = rotate_vectors_list(ress,an_list)
-#   test_points = test_points + abs_vec
-#   p_m = PtToMap(test_points,test_label.shape)
-#   norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-#   an_list = normListToAngelList(norm_list)
-#   plt.imshow(p_m + test_data,cmap = 'gray',interpolation = 'nearest')
-#   plt.show()
-# exit()
-# ########################previous_gradient_single_point#############################
-
-saver.restore(sess, '../models/DEEP_SNAKE_1_30_cleans_limitedCircle_at_0.745335')
-# # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
-
-
-
-data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
-label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
 # print "The shape of test pathes is:"
 # print data.shape
@@ -203,15 +158,70 @@ label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
 
 # test_points = generate_psedu_points(test_label)
-# # test_points = test_points[:12]
+# single_point = test_points[5]
 # print "the length of contour points is:"
 # print len(test_points)
-# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-# an_list = normListToAngelList(norm_list)
+# # norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+# # an_list = normListToAngelList(norm_list)
+# SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(test_label)
+# x,y = single_point
+# u = SDMmap_vec_gradient[y,x,0]
+# v = SDMmap_vec_gradient[y,x,1]
+# init_an = normToAngel((u,v))
 
+# plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+# plt.show()
 
-# for i in range(50):
-    
+# point_list = []
+# angle = 0
+# for i in range(3000):
+  
+ 
+#   if i == 0:
+#     print "first iteration"
+#     xx,yy = single_point
+#     patch = corp(test_data,init_an,xx,yy)
+#     # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+#     # plt.show()
+#     patch = patch[np.newaxis,:,:,np.newaxis]
+#     ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+#     print 'rel ang:', ress
+#     abs_vec = rotate_vector(ress[0],init_an)
+#     print single_point
+#     single_point = single_point + l2_norm(abs_vec)
+
+#     abs_vec_norm = l2_norm(abs_vec)
+#     angle = normToAngel(abs_vec_norm)
+#     print 'abs ang:', angle
+#     # p_m = PtOnMap(single_point,test_label.shape)
+#     point_list.append(single_point)
+#     continue
+#     # plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
+#     # plt.show()
+#   print "iteration", i
+#   xx,yy = single_point
+#   patch = corp(test_data,angle,xx,yy)
+#   # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+#   # plt.show()
+#   patch = patch[np.newaxis,:,:,np.newaxis]
+
+#   ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+#   print 'rel ang:', ress
+#   abs_vec = rotate_vector(ress[0],angle)
+  
+#   single_point = single_point + l2_norm(abs_vec)
+  
+#   abs_vec_norm = l2_norm(abs_vec)
+
+#   angle = normToAngel(abs_vec_norm)
+#   print 'abs ang:', angle
+#   # p_m = PtOnMap(single_point,test_label.shape)
+
+#   point_list.append(single_point)
+
+# p_mm = PtToMap(point_list,test_label.shape)
+# plt.imshow(p_mm + test_data,cmap = 'gray',interpolation = 'nearest')
+# plt.show()
 
 
 #   patch_list = []

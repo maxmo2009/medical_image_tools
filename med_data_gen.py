@@ -32,8 +32,8 @@ print data.shape
 
 
     
-d_train = data[5:6,:,:,0]
-l_train = label[5:6,:,:,0]
+d_train = data[1:30,:,:,0]
+l_train = label[1:30,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
@@ -98,8 +98,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_5_6_limitedCircle_preSin.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_5_6_limitedCircle_preSin.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin.npy', f_v)
 
 
 

@@ -83,6 +83,10 @@ from medpy.io import load
 
 
 
+print rotate_vector((2,0),90)
+
+exit()
+
 
 path = "/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/challenge_training/SC-HF-I-1/IM-0002-0009.dcm"
 

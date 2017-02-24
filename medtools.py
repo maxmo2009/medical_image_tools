@@ -125,10 +125,13 @@ def generator_ponits_c(raw,k,xx = 128,yy = 128,r = 70):
 def PtToMap(i_p,size):
   i_m = np.zeros(size)
   for x in i_p:
-    i_m[x[1]][x[0]] = 1 #used to be i_m[x[1]][x[0]] = 1
+    i_m[int(round(x[1]))][int(round(x[0]))] = 1 #used to be i_m[x[1]][x[0]] = 1
     #i_m[y,x]!!!
   return i_m
-
+def PtOnMap(point,size):
+  i_m = np.zeros(size)
+  i_m[int(round(point[1]))][int(round(point[0]))] = 1
+  return i_m
 
 def get_norm_T(points):
   ox = 128
@@ -187,6 +190,9 @@ def normListToAngelList(norm):
   for item in norm:
     an_l.append(angle_clockwise(item))
   return an_l
+
+def normToAngel(norm):
+  return angle_clockwise(norm)
 
 def get_vecF_from_label_relative(points,label,ang):
 
