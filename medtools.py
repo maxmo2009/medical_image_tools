@@ -362,7 +362,7 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
 
   return np.array(final_patch), np.array(final_vec)
 
-def get_limited_circle_gradient_SDMmap(label,ee=15):
+def get_limited_circle_gradient_SDMmap(label,ee=25):
   e = ee
   selem = disk(e)
   filled_label = ndimage.binary_fill_holes(label).astype(int)

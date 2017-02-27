@@ -7,7 +7,7 @@ import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '5_6_cleans_limitedCircle_PreSin'
+model_n = '1_30_cleans_limitedCircle_PreSin_regula'
 # 
 
 # with tf.device('/gpu:0'):
@@ -107,136 +107,124 @@ init=tf.initialize_all_variables()
 sess.run(init)
 
 saver = tf.train.Saver()
+for p in denseO.all_params:
+  qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
 
 #################################################################################
-start_time = time.time()
-for i in range(2000):
-  total_loss = 0
+# start_time = time.time()
+# for i in range(2000):
+#   total_loss = 0
  
-  for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
-    _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
+#   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
+#     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
     
-    # total_loss = total_loss + los
-    # print 'This is label: ', y_train
-    # print 'This is predict: ', res
-    # print 'This is loss: ', los
-  # if i%10 == 0:
+#     # total_loss = total_loss + los
+#     # print 'This is label: ', y_train
+#     # print 'This is predict: ', res
+#     # print 'This is loss: ', los
+#   # if i%10 == 0:
     
-  print "EPOCH: " + str(i) + ":" 
-  print "The total lose is:" + str(los)
-  if i%50 == 0:
-    saver.save(sess, '../models/presin_1_30_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
-  if los <= 0.5:
-    break
+#   print "EPOCH: " + str(i) + ":" 
+#   print "The total lose is:" + str(los)
+#   if i%50 == 0:
+#     saver.save(sess, '../models/presin_1_30_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+#   if los <= 0.5:
+#     break
 
 
-saver.save(sess, '../models/presin_1_30_unreg/final_DEEP_SNAKE_' + model_n)
-elapsed_time = time.time() - start_time
-print "time last for: " 
-print elapsed_time
+# saver.save(sess, '../models/presin_1_30_unreg/final_DEEP_SNAKE_' + model_n)
+# elapsed_time = time.time() - start_time
+# print "time last for: " 
+# print elapsed_time
 
 
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 
-# saver.restore(sess, '../models/presin/final_DEEP_SNAKE_5_6_cleans_limitedCircle_PreSin')
-# # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
+saver.restore(sess, '../models/presin/final_DEEP_SNAKE_5_6_cleans_limitedCircle_PreSin')
+# # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-# data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
-# label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
+data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
-# print "The shape of test pathes is:"
-# print data.shape
+print "The shape of test pathes is:"
+print data.shape
 
-# # train_label = label[6,:,:,0]
-# test_label = label[7,:,:,0]
+# train_label = label[6,:,:,0]
+test_label = label[5,:,:,0]
 
-# # train_data = data[6,:,:,0]
-# test_data = data[7,:,:,0]
+# train_data = data[6,:,:,0]
+test_data = data[5,:,:,0]
 
 
-# test_points = generate_psedu_points(test_label)
-# single_point = test_points[5]
-# print "the length of contour points is:"
-# print len(test_points)
-# # norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-# # an_list = normListToAngelList(norm_list)
-# SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(test_label)
-# x,y = single_point
-# u = SDMmap_vec_gradient[y,x,0]
-# v = SDMmap_vec_gradient[y,x,1]
-# init_an = normToAngel((u,v))
+test_points = generate_psedu_points(test_label)
+single_point = test_points[5]
+print "the length of contour points is:"
+print len(test_points)
+# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+# an_list = normListToAngelList(norm_list)
+SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(test_label)
+x,y = single_point
+u = SDMmap_vec_gradient[y,x,0]
+v = SDMmap_vec_gradient[y,x,1]
+init_an = normToAngel((u,v))
 
-# plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
-# plt.show()
+plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+plt.show()
 
-# point_list = []
-# angle = 0
-# for i in range(3000):
+point_list = []
+angle = 0
+for i in range(3000):
   
  
-#   if i == 0:
-#     print "first iteration"
-#     xx,yy = single_point
-#     patch = corp(test_data,init_an,xx,yy)
-#     # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
-#     # plt.show()
-#     patch = patch[np.newaxis,:,:,np.newaxis]
-#     ress = sess.run(denseO.outputs,feed_dict={xi:patch})
-#     print 'rel ang:', ress
-#     abs_vec = rotate_vector(ress[0],init_an)
-#     print single_point
-#     single_point = single_point + l2_norm(abs_vec)
+  if i == 0:
+    print "first iteration"
+    xx,yy = single_point
+    patch = corp(test_data,init_an,xx,yy)
+    # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+    # plt.show()
+    patch = patch[np.newaxis,:,:,np.newaxis]
+    ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+    print 'rel ang:', ress
+    abs_vec = rotate_vector(ress[0],init_an)
+    print single_point
+    single_point = single_point + abs_vec
 
-#     abs_vec_norm = l2_norm(abs_vec)
-#     angle = normToAngel(abs_vec_norm)
-#     print 'abs ang:', angle
-#     # p_m = PtOnMap(single_point,test_label.shape)
-#     point_list.append(single_point)
-#     continue
-#     # plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
-#     # plt.show()
-#   print "iteration", i
-#   xx,yy = single_point
-#   patch = corp(test_data,angle,xx,yy)
-#   # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
-#   # plt.show()
-#   patch = patch[np.newaxis,:,:,np.newaxis]
+    abs_vec_norm = l2_norm(abs_vec)
+    angle = normToAngel(abs_vec_norm)
+    print 'abs ang:', angle
+    # p_m = PtOnMap(single_point,test_label.shape)
+    point_list.append(single_point)
+    continue
+    # plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
+    # plt.show()
+  print "iteration", i
+  xx,yy = single_point
+  patch = corp(test_data,angle,xx,yy)
+  # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+  # plt.show()
+  patch = patch[np.newaxis,:,:,np.newaxis]
 
-#   ress = sess.run(denseO.outputs,feed_dict={xi:patch})
-#   print 'rel ang:', ress
-#   abs_vec = rotate_vector(ress[0],angle)
+  ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+  print 'rel ang:', ress
+  abs_vec = rotate_vector(ress[0],angle)
   
-#   single_point = single_point + l2_norm(abs_vec)
+  single_point = single_point + abs_vec
   
-#   abs_vec_norm = l2_norm(abs_vec)
+  abs_vec_norm = l2_norm(abs_vec)
 
-#   angle = normToAngel(abs_vec_norm)
-#   print 'abs ang:', angle
-#   # p_m = PtOnMap(single_point,test_label.shape)
+  angle = normToAngel(abs_vec_norm)
+  print 'abs ang:', angle
+  # p_m = PtOnMap(single_point,test_label.shape)
 
-#   point_list.append(single_point)
+  point_list.append(single_point)
 
-# p_mm = PtToMap(point_list,test_label.shape)
-# plt.imshow(p_mm + test_data,cmap = 'gray',interpolation = 'nearest')
-# plt.show()
+p_mm = PtToMap(point_list,test_label.shape)
+plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+plt.show()
+plt.imshow(p_mm*0.5 + test_data,cmap = 'gray',interpolation = 'nearest')
+plt.show()
 
 
-#   patch_list = []
-#   for p,an in zip(test_points,an_list):
-#     x,y = p
-#     patch = corp(test_data,an,x,y)
-#     patch_list.append(patch)
-#     # ress = sess.run(denseO.outputs,feed_dict={xi:patch[:,:,np.newaxis]})
-#   t_p = np.array(patch_list)
-#   t_p = t_p[:,:,:,np.newaxis]
-#   ress = sess.run(denseO.outputs,feed_dict={xi:t_p})
-#   abs_vec = rotate_vectors_list(ress,an_list)
-#   test_points = test_points + abs_vec
-#   p_m = PtToMap(test_points,test_label.shape)
-#   norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-#   an_list = normListToAngelList(norm_list)
-#   plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
-#   plt.show()

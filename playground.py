@@ -82,19 +82,52 @@ from medpy.io import load
 # plt.show()
 
 
+# X, Y = np.meshgrid(np.arange(0, 2 * np.pi, .2), np.arange(0, 2 * np.pi, .2))
+# XX, YY = np.meshgrid(np.arange(0, 2 * np.pi, .5), np.arange(0, 2 * np.pi, .5))
 
-print rotate_vector((2,0),90)
+# U = np.cos(XX)
+# V = np.sin(YY)
+# print X.shape
+# print U.shape
 
-exit()
+# plt.figure()
+# plt.title('Arrows scale with plot width, not view')
+# Q = plt.quiver(X, Y, U, V, units='width')
+# qk = plt.quiverkey(Q, 1, 1, 2, r'$2 \frac{m}{s}$', labelpos='E',
+#                    coordinates='figure')
+# plt.show()
+# exit()
 
 
 path = "/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/challenge_training/SC-HF-I-1/IM-0002-0009.dcm"
+data_p = '/media/dsigpu5/SSD/YUANHAN/data'
+label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
 
 
+# label_SDM, label_abs_SDM = get_SDMmap(label[5,:,:,0])
+SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
 
-image_data, image_header = load(path)
-print image_data.shape
-plt.imshow(image_data)
+Y, X = np.mgrid[0:288:48j, 0:288:48j]
+
+
+U = SDMmap_vec_gradient[:,:,0]
+
+V = SDMmap_vec_gradient[:,:,1]
+
+U = U[::6,::6]/120
+V = V[::6,::6]/120
+
+U = np.around(U, decimals=2)
+V = np.around(V, decimals=2)
+
+print U.shape
+print U
+
+plt.title('Arrows scale with plot width, not view')
+Q = plt.quiver(X, Y, U, V,scale=1)
+# qk = plt.quiverkey(Q, 1, 1, 2, r'$2 \frac{m}{s}$', labelpos='E',
+                    # coordinates='figure')
 plt.show()
 
 exit()
@@ -124,7 +157,7 @@ lw = 5*speed / speed.max()
 
 fig0, ax0 = plt.subplots()
 # strm = ax0.streamplot(X, Y, U, V, color=U, linewidth=lw, cmap=plt.cm.autumn)
-strm = ax0.streamplot(X, Y, U, V, color=U,density=5, linewidth=1, cmap=plt.cm.autumn)
+strm = ax0.streamplot(X, Y, U, V, color=U, linewidth=lw, cmap=plt.cm.autumn)
 # fig0.colorbar(strm.lines)
 
 # ax2.streamplot(X, Y, U, V, density=0.6, color='k', linewidth=lw)                                                     
