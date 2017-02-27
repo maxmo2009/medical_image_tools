@@ -9,12 +9,30 @@ from skimage import measure
 import numpy as np
 import matplotlib.pyplot as plt
 from medpy.io import load
-# a = np.array([[1,1,1,1],
-# 	          [2,2,2,2],
-# 	          [1,1,0,1],
-# 	          [2,2,2,2]])
+from sklearn.utils import shuffle
 
 
+
+
+
+
+
+
+
+a = np.array([[1,1,1,1],
+ 	          [2,2,2,2],
+	          [1,1,0,1],
+ 	          [2,1,2,2]])
+b = np.array([[1,2],
+ 	           [2,1],
+ 	           [2,3]
+ 	           ])
+c,d = shuffle(a,b)
+
+print c
+print d
+
+exit()
 # plt.imshow(a)
 # plt.show()
 # exit()

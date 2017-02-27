@@ -107,8 +107,9 @@ init=tf.initialize_all_variables()
 sess.run(init)
 
 saver = tf.train.Saver()
-for p in denseO.all_params:
-  qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
+# regulizer
+# for p in denseO.all_params:
+#   qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
 
 #################################################################################
 # start_time = time.time()

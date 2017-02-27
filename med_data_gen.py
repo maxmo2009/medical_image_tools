@@ -6,7 +6,7 @@ from skimage.morphology import erosion, dilation, opening, closing, white_tophat
 from skimage.morphology import disk
 from scipy import ndimage
 import math
-
+from sklearn.utils import shuffle
 
 
 
@@ -30,7 +30,7 @@ print data.shape
 
 # data,label = remove_empty_label(data,label)
 
-
+data,label = shuffle(data,label)
     
 d_train = data[1:30,:,:,0]
 l_train = label[1:30,:,:,0]
@@ -98,8 +98,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin_shuffled.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin_shuffled.npy', f_v)
 
 
 
