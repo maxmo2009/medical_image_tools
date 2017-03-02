@@ -7,14 +7,14 @@ import time
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '1_30_cleans_limitedCircle_PreSin_regula'
+model_n = '1_50_cleans_limitedCircle_PreSin_regula'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
@@ -128,12 +128,12 @@ saver = tf.train.Saver()
 #   print "EPOCH: " + str(i) + ":" 
 #   print "The total lose is:" + str(los)
 #   if i%50 == 0:
-#     saver.save(sess, '../models/presin_1_30_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+#     saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
 #   if los <= 0.5:
 #     break
 
 
-# saver.save(sess, '../models/presin_1_30_unreg/final_DEEP_SNAKE_' + model_n)
+# saver.save(sess, '../models/presin_1_50_unreg/final_DEEP_SNAKE_' + model_n)
 # elapsed_time = time.time() - start_time
 # print "time last for: " 
 # print elapsed_time
@@ -142,7 +142,7 @@ saver = tf.train.Saver()
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 
-saver.restore(sess, '../models/presin/final_DEEP_SNAKE_5_6_cleans_limitedCircle_PreSin')
+saver.restore(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_1_50_cleans_limitedCircle_PreSin_regula_at_0.579801')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
@@ -152,12 +152,11 @@ label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 
 print "The shape of test pathes is:"
 print data.shape
-
 # train_label = label[6,:,:,0]
-test_label = label[5,:,:,0]
+test_label = label[10,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[5,:,:,0]
+test_data = data[10,:,:,0]
 
 
 test_points = generate_psedu_points(test_label)
@@ -177,7 +176,7 @@ plt.show()
 
 point_list = []
 angle = 0
-for i in range(3000):
+for i in range(1000):
   
  
   if i == 0:

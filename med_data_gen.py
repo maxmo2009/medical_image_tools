@@ -30,10 +30,13 @@ print data.shape
 
 # data,label = remove_empty_label(data,label)
 
-data,label = shuffle(data,label)
-    
-d_train = data[1:30,:,:,0]
-l_train = label[1:30,:,:,0]
+data,label = shuffle(data,label,random_state=1)
+
+data = np.delete(data, [20],0)
+label = np.delete(label, [20],0)
+
+d_train = data[1:40,:,:,0]
+l_train = label[1:40,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
@@ -98,8 +101,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_1_30_limitedCircle_preSin_shuffled.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_1_30_limitedCircle_preSin_shuffled.npy', f_v)
+np.save(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_p)
+np.save(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_v)
 
 
 

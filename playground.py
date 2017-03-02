@@ -25,9 +25,9 @@ a = np.array([[1,1,1,1],
  	          [2,1,2,2]])
 b = np.array([[1,2],
  	           [2,1],
- 	           [2,3]
- 	           ])
-c,d = shuffle(a,b)
+ 	           [2,3],
+ 	           [3,3]])
+c,d = shuffle(a,b,random_state=1)
 
 print c
 print d
