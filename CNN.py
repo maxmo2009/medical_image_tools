@@ -1,10 +1,17 @@
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from medtools import *
+import time
+from sklearn.utils import shuffle
 import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
-from medtools import *
-import matplotlib.pyplot as plt
-import time
-from sklearn.utils import shuffle
+from medpy.metric.binary import dc
+from scipy import ndimage
+from PIL import Image, ImageDraw
+from skimage import measure
+
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 model_n = '1_50_cleans_limitedCircle_PreSin_regula'
@@ -12,23 +19,27 @@ model_n = '1_50_cleans_limitedCircle_PreSin_regula'
 
 # with tf.device('/gpu:0'):
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+print("Loading patches")
+# patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+print("Loading vecs")
 vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+print("Loading data SUCCESS")
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
-patches = patches[:,:,:,np.newaxis]
+#patches = patches[:,:,:,np.newaxis]
 # test_patches = test_patches[:,:,:,np.newaxis]
 
-print patches.shape
-print vecs.shape
+# print (patches.shape)
+print (vecs.shape)
 
 
 tf.set_random_seed(0)
 tl.layers.set_name_reuse(True)
 
-n,x,y,c = patches.shape
+# n,x,y,c = patches.shape
+n,x,y,c = (791523,64,64,1)
 
 batch_size = 512
 
@@ -141,7 +152,8 @@ saver = tf.train.Saver()
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 
-saver.restore(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_1_50_cleans_limitedCircle_PreSin_regula_at_0.579801')
+originpath = "/home/dsigpu5/Desktop/work_space/med_image_src"
+saver.restore(sess, originpath + '/models/presin_1_50_unreg/DEEP_SNAKE_1_50_cleans_limitedCircle_PreSin_regula_at_0.579801')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
@@ -151,80 +163,191 @@ label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 data,label = shuffle(data,label,random_state=1)
 print "The shape of test pathes is:"
 print data.shape
-# train_label = label[6,:,:,0]
-test_label = label[44,:,:,0]
 
-# train_data = data[6,:,:,0]
-test_data = data[44,:,:,0]
-
-
-test_points = generate_psedu_points(test_label)
-single_point = test_points[5]
-print "the length of contour points is:"
-print len(test_points)
-# norm_list = get_norm_by_spline_first_derivitive(list(test_points))
-# an_list = normListToAngelList(norm_list)
-SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(test_label)
-x,y = single_point
-u = SDMmap_vec_gradient[y,x,0]
-v = SDMmap_vec_gradient[y,x,1]
-init_an = normToAngel((u,v))
-
-plt.imshow(test_label,cmap = 'gray',interpolation = 'nearest')
-plt.show()
-
-point_list = []
-angle = 0
+drop = 0
+overlap_sum = 0
+overlap_sum2 = 0
+overlap_sumb = 0
+overlap_num = 0
+overlap_numb = 0
 
 
-for i in range(300):
+for idx in range(30, data.shape[0]):
+    try:
+        # train_label = label[6,:,:,0]
+        test_label = label[idx,:,:,0]
 
-  if i == 0:
-    print "first iteration"
-    xx,yy = single_point
-    patch = corp(test_data,init_an,xx,yy)
-    # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
-    # plt.show()
-    patch = patch[np.newaxis,:,:,np.newaxis]
-    ress = sess.run(denseO.outputs,feed_dict={xi:patch})
-    print 'rel ang:', ress
-    abs_vec = rotate_vector(ress[0],init_an)
-    print single_point
-    single_point = single_point + abs_vec
+        # train_data = data[6,:,:,0]
+        test_data = data[idx,:,:,0]
 
-    abs_vec_norm = l2_norm(abs_vec)
-    angle = normToAngel(abs_vec_norm)
-    print 'abs ang:', angle
-    # p_m = PtOnMap(single_point,test_label.shape)
-    point_list.append(single_point)
-    continue
-    # plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
-    # plt.show()
-  print "iteration", i
-  xx,yy = single_point
-  patch = corp(test_data,angle,xx,yy)
-  # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
-  # plt.show()
-  patch = patch[np.newaxis,:,:,np.newaxis]
 
-  ress = sess.run(denseO.outputs,feed_dict={xi:patch})
-  print 'rel ang:', ress
-  abs_vec = rotate_vector(ress[0],angle)
+        test_points = generate_psedu_points(test_label)
+        single_point = test_points[5]
+        # print "Contour points: %4d" % (len(test_points))
 
-  single_point = single_point + abs_vec
+        # norm_list = get_norm_by_spline_first_derivitive(list(test_points))
+        # an_list = normListToAngelList(norm_list)
+        SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(test_label)
+        x,y = single_point
+        u = SDMmap_vec_gradient[y,x,0]
+        v = SDMmap_vec_gradient[y,x,1]
+        init_an = normToAngel((u,v))
 
-  abs_vec_norm = l2_norm(abs_vec)
+        # plt.imshow(test_label,cmap = 'gray',interpolation = 'nearest')
+        # plt.show()
 
-  angle = normToAngel(abs_vec_norm)
-  print 'abs ang:', angle
-  # p_m = PtOnMap(single_point,test_label.shape)
+        point_list = []
+        angle = 0
 
-  point_list.append(single_point)
 
-p_mm = PtToMap(point_list,test_label.shape)
-plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
-plt.show()
-plt.imshow(p_mm*0.5 + test_data,cmap = 'gray',interpolation = 'nearest')
-plt.show()
+        for i in range(1000):
+
+          if i == 0:
+            # print "first iteration"
+            xx,yy = single_point
+            patch = corp(test_data,init_an,xx,yy)
+            # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+            # plt.show()
+            patch = patch[np.newaxis,:,:,np.newaxis]
+            ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+            # print 'rel ang:', ress
+            abs_vec = rotate_vector(ress[0],init_an)
+            # print single_point
+            single_point = single_point + abs_vec
+
+            abs_vec_norm = l2_norm(abs_vec)
+            angle = normToAngel(abs_vec_norm)
+            # print 'abs ang:', angle
+            # p_m = PtOnMap(single_point,test_label.shape)
+            point_list.append(single_point)
+            continue
+            # plt.imshow(p_m + test_label,cmap = 'gray',interpolation = 'nearest')
+            # plt.show()
+          # print "iteration", i
+          xx,yy = single_point
+          # print(test_data)
+          # print(angle)
+          # print(xx)
+          # print(yy)
+          patch = corp(test_data,angle,xx,yy)
+          # plt.imshow(patch,cmap = 'gray',interpolation = 'nearest')
+          # plt.show()
+          patch = patch[np.newaxis,:,:,np.newaxis]
+
+          ress = sess.run(denseO.outputs,feed_dict={xi:patch})
+          # print 'rel ang:', ress
+          abs_vec = rotate_vector(ress[0],angle)
+
+          single_point = single_point + abs_vec
+
+          point_list.append(single_point)
+
+          if i > 500:
+              abs_vec_norm = l2_norm(abs_vec + get_first_der(point_list))
+              angle = normToAngel(abs_vec_norm)
+              # print('i ' + repr(angle))
+          else:
+              abs_vec_norm = l2_norm(abs_vec)
+              angle = normToAngel(abs_vec_norm)
+              # print(angle)
+          # if i > 520:
+          #    exit()
+          # print 'abs ang:', angle
+          # p_m = PtOnMap(single_point,test_label.shape)
+
+
+        # exit()
+
+        label_fill = ndimage.binary_fill_holes(test_label).astype(int)
+        # plt.imshow(label_fill,cmap = 'gray',interpolation = 'nearest')
+        # plt.savefig("figures/result_%4d_label.png" % (idx))
+        # print(point_list)
+
+
+        threshold = 3
+        period = 250
+        min = 1000000
+        end = point_list[-1]
+        for j in range(len(point_list)-30, -1, -1):
+            cur = point_list[j]
+            if abs(cur[0]-end[0]) <= threshold and abs(cur[1]-end[1]) <= threshold:
+                dis = np.sum((cur-end)**2)
+                if dis < min:
+                    min = dis
+                else:
+                    period = len(point_list) - j
+                    break
+
+        # print(period)
+        # continue
+
+        segmt = np.reshape(np.around(point_list[-period:]), (-1,)).astype(int)
+        segmt = list(segmt)
+        img = Image.new('L', test_data.shape, 0)
+        ImageDraw.Draw(img).polygon(segmt, outline=1)
+        outline = np.array(img)
+
+        segmt_fill = ndimage.binary_fill_holes(outline).astype(int)
+        segmt_fill2 = segmt_fill - outline
+
+        # plt.imshow(segmt_fill,cmap = 'gray',interpolation = 'nearest')
+        # plt.savefig("figures/result_%4d_segmt.png" % (idx))
+        # print(segmt_fill)
+        # exit()
+
+        # plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+        # plt.show()
+        overlap = dc(label_fill, segmt_fill)
+        overlap2 = dc(label_fill, segmt_fill2)
+        print("Index: %4d, Overlap: %.4f"%(idx, overlap2))
+        overlap_sum += overlap
+        overlap_sum2 += overlap2
+        if overlap2 > 0.8:
+            overlap_sumb += overlap2
+            overlap_numb += 1
+        overlap_num += 1
+
+        p_mm = PtToMap(point_list[-period:],test_label.shape)
+
+        red_label  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        red_label[:,:,0] = contour(test_label)
+
+        grey_data  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        for s in range(0, 3):
+            grey_data[:,:,s] = test_data.copy()
+
+        yellow_seg = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        for s in range(0, 3):
+            yellow_seg[:,:,s] = p_mm.copy()
+
+        img_data = grey_data*5 + red_label + yellow_seg
+        print(np.max(img_data))
+        plt.imshow(img_data/img_data.max())
+        plt.savefig("figures/result_%4d_%.4f.png" % (idx, overlap2))
+
+    except (IndexError):
+        drop += 1
+        print("Index: %4d, Drop: No.%2d"%(idx, drop))
+
+        red_label  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        print(test_label.shape)
+        red_label[:,:,0] = contour(test_label)
+        # red_label[:,:,0] = test_label
+        grey_data  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        for s in range(0, 3):
+            grey_data[:,:,s] = test_data.copy()
+
+        img_data = grey_data*5 + red_label
+        print(np.max(img_data))
+        plt.imshow(img_data/img_data.max())
+        plt.savefig("figures/drop_%4d.png" % (idx))
+
+print(overlap_sum / overlap_num)
+print(overlap_sum2 / overlap_num)
+print(overlap_sumb / overlap_numb)
+
+# without black magic: 0.8742, 0.8819, 0.9184
+# with black magic:    0.8798, 0.8843, 0.9215
+
 
 

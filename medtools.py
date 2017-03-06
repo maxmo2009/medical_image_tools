@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import matplotlib.pyplot as plt
 from skimage.draw import circle_perimeter,polygon, circle
 from skimage.filters import gaussian
@@ -34,7 +34,7 @@ def inner_angle(v,w):
    cosx=dot_product(v,w)/(length(v) * length(w))
    rad=acos(cosx) # in radians
    return rad*180/pi # returns degrees
-   
+
 
 def angle_clockwise(A,B = (0,-1)): #norm to angle (degree)
     if A == (0,0):
@@ -63,10 +63,10 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
   # print roi.shape
   m_x, m_y = roi.shape
   m_x = int(round(m_x/2,0))
-  m_y = int(round(m_y/2,0)) 
+  m_y = int(round(m_y/2,0))
   f = roi[m_x-w:m_x+w ,m_y-w:m_y+w]
   # f = roi[m_x-w+1:m_x+w + 1,m_y-w+1:m_y+w + 1]
-  # print f.shape 
+  # print f.shape
   # f = resize(f,(2*w,2*w),preserve_range = True)
   # print f.max()
   return f
@@ -84,7 +84,7 @@ def generate_psedu_points(label,k = 15,ee = 10): #ee: how far is going to dialia
 
   p_l = np.array(contours_label)
   p_l = p_l[0,:,:]
-  
+
   p_l[:,[0,1]] = p_l[:,[1,0]]
 
   # print p_l
@@ -112,7 +112,7 @@ def rotate_vectors_list(vecs,an):#take degree(0-360) not radis(0-2pi), rotate a 
     y = i[0]*sin(j) + i[1]*cos(j)
     new_l.append([x,y])
   return np.array(new_l)
- 
+
 def generator_ponits_c(raw,k,xx = 128,yy = 128,r = 70):
   wx,wy = raw.shape
   init_points = []
@@ -123,6 +123,12 @@ def generator_ponits_c(raw,k,xx = 128,yy = 128,r = 70):
     y = np.sin(d)* (r + np.random.normal(0,5)) + yy
     init_points.append((int(round(x,0)),int(round(y,0))))
   return init_points
+
+def RmPtBoundary(i_p,img):
+  for x in i_p:
+    img[int(round(x[1]))][int(round(x[0]))] = 0 #used to be i_m[x[1]][x[0]] = 1
+    #i_m[y,x]!!!
+  return img
 
 def PtToMap(i_p,size):
   i_m = np.zeros(size)
@@ -169,7 +175,7 @@ def get_norm_by_spline_first_derivitive(points,angle =True):
   ps = points[:]
   ps.append(ps[-1])
   pt = np.array(ps)
-  tck, u = splprep(pt.T, u=None, s=0.0, per=1) 
+  tck, u = splprep(pt.T, u=None, s=0.0, per=1)
   u = u[:-1]
 
 
@@ -179,14 +185,14 @@ def get_norm_by_spline_first_derivitive(points,angle =True):
 
   norm_out = []
   norm_in = []
-  
+
   for item in xy_T:
 
     norm_out.append(l2_norm((item[1],-item[0])))
     norm_in.append(l2_norm((-item[1],item[0])))
 
   return norm_in #size of 8
-  
+
 def normListToAngelList(norm):
   an_l = []
   for item in norm:
@@ -212,7 +218,7 @@ def get_vecF_from_label_relative(points,label,ang):
 
   c_x = patch_size - 1
   c_y = patch_size - 1
-  
+
   for pa in p_l:
     o_d = 10000.0
     for i in range(len(pa)):
@@ -223,10 +229,10 @@ def get_vecF_from_label_relative(points,label,ang):
             # v_l[jj] = (j-c_x,i-c_y)
             v_l[jj] = (c_x - j,c_y - i)
     jj = jj + 1
-  return v_l 
-  
+  return v_l
 
-     
+
+
 def l2_norm(vec):
   dx,dy = vec
   mag = np.linalg.norm(vec)
@@ -234,7 +240,7 @@ def l2_norm(vec):
     return (1,0)
   return (dx/mag,dy/mag)
 
-def l2_norm_list(vec_list): 
+def l2_norm_list(vec_list):
   pass
 
 def mean_distance(vec_1,vec_2): #inputs are two vectors lists
@@ -294,7 +300,7 @@ def get_gradient_SDMmap(SDMmap):
   temp = np.ndarray((x,y,2))
   temp[:,:,0] = dx
   temp[:,:,1] = dy
-  
+
   return temp
 
 
@@ -310,7 +316,7 @@ def scale_SDMmap_gradient(SDM_gradient, scale_matrix):
 def iterate_mask(mask):
   points_list = []
   for i in range(len(mask)):#iterate over Y row
-    for j in range(len(mask[i])):#iterate over X 
+    for j in range(len(mask[i])):#iterate over X
       if mask[i][j] == 1:
         points_list.append((j,i))
   return points_list
@@ -352,10 +358,10 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
     dvx = SDM_vec_grad[y][x][0]
     dvy = SDM_vec_grad[y][x][1]
 
-    gradient_corp = (dx,dy) 
-    gradient_vec = (dvx,dvy) 
+    gradient_corp = (dx,dy)
+    gradient_vec = (dvx,dvy)
 
-    
+
 
     patch_list_per_cord, vec_list_per_cord = multipy_sample_pathch_vecs(img,cord,gradient_corp,gradient_vec,dev_list)
     final_patch = final_patch + patch_list_per_cord
@@ -364,14 +370,32 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
 
   return np.array(final_patch), np.array(final_vec)
 
+def contour(label):
+  filled_label = ndimage.binary_fill_holes(label).astype(int)
+  contours_label = measure.find_contours(filled_label, 0.8)
+  # print(contours_label)
+
+  p_l = np.array(contours_label)
+  # print "Contour's shape is",p_l.shape
+  try:
+      p_l = p_l[0,:,:]
+
+      p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
+
+      label_contour = PtToMap(p_l,(288,288))
+      return label_contour
+  except (IndexError):
+      return label
+
+
 def get_limited_circle_gradient_SDMmap(label,ee=25):
   e = ee
   selem = disk(e)
   filled_label = ndimage.binary_fill_holes(label).astype(int)
   contours_label = measure.find_contours(filled_label, 0.8)
- 
+
   p_l = np.array(contours_label)
-  print "Contour's shape is",p_l.shape
+  # print "Contour's shape is",p_l.shape
   p_l = p_l[0,:,:]
 
   p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
@@ -385,7 +409,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
   scale_label_abs_SDM = (mask_label_contour*label_abs_SDM)/(mask_label_contour*label_abs_SDM).max()
   print label_abs_SDM.max()
   for i in range(len(out_mask)):#iterate over Y row
-    for j in range(len(out_mask[i])):#iterate over X 
+    for j in range(len(out_mask[i])):#iterate over X
       if out_mask[i,j] == 1:
         scale = scale_label_abs_SDM[i][j]
         scale_deg = (1-scale)*90.0
@@ -395,7 +419,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
         gradient[i,j,1] = rotated_xy[1]
         gradient[i,j,0] = rotated_xy[0]
   for i in range(len(inner_mask)):#iterate over Y row
-    for j in range(len(inner_mask[i])):#iterate over X 
+    for j in range(len(inner_mask[i])):#iterate over X
       if inner_mask[i,j] == 1:
         scale = scale_label_abs_SDM[i][j]
         scale_deg = (1-scale)*-90.0
@@ -416,6 +440,26 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
 
 # g_a = get_gradient_SDMmap(a)
 # print g_a.shape
+
+
+
+# black magic
+def get_first_der(ptlist):
+    mom = 4
+    eta = 0.35
+    pt = np.asarray(ptlist[-mom:])
+    dr = np.zeros((mom-1,2))
+    for i in range(0, mom-1):
+        dr[i,:] = pt[i+1] - pt[i]
+    vec = np.zeros(2)
+    pd = 0
+    for i in range(0, mom-2):
+        cd = dr[i+1] - dr[i]
+        diff = cd - pd
+        vec += diff * (eta)**(i)
+        pd = cd
+    vec /= mom - 2
+    return vec
 
 
 
@@ -451,7 +495,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
 
 
 # rr, cc = circle(128,128,50)
-# circle_raw[rr,cc] = 0 
+# circle_raw[rr,cc] = 0
 # rr, cc = circle_perimeter(128,128,50)
 # circle_raw = gaussian(circle_raw,sigma = 8)
 # circle_label[rr,cc] = 1
