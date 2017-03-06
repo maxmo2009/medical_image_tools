@@ -153,10 +153,10 @@ data,label = shuffle(data,label,random_state=1)
 print "The shape of test pathes is:"
 print data.shape
 # train_label = label[6,:,:,0]
-test_label = label[91,:,:,0]
+test_label = label[44,:,:,0]
 
 # train_data = data[6,:,:,0]
-test_data = data[91,:,:,0]
+test_data = data[44,:,:,0]
 
 
 test_points = generate_psedu_points(test_label)
@@ -171,7 +171,7 @@ u = SDMmap_vec_gradient[y,x,0]
 v = SDMmap_vec_gradient[y,x,1]
 init_an = normToAngel((u,v))
 
-plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
+plt.imshow(test_label,cmap = 'gray',interpolation = 'nearest')
 plt.show()
 
 point_list = []

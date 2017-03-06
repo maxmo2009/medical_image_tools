@@ -16,10 +16,12 @@ from math import *
 from scipy import ndimage
 from skimage import measure
 import skfmm
-
+from sklearn.utils import shuffle
 # from scipy.interpolate import splprep, splev
 from scipy.interpolate import splprep, splev
 patch_size = 32 #pathcsize * 2
+
+
 
 
 def length(v):

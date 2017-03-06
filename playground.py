@@ -123,21 +123,21 @@ label = np.load(data_p + '/data/labels.npy').astype(np.int32)
 data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
 
 
+plt.imshow(data[5,:,:,0],cmap = 'gray',interpolation = 'nearest')
+plt.show()
+
 # label_SDM, label_abs_SDM = get_SDMmap(label[5,:,:,0])
 SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
 
-Y, X = np.mgrid[0:288:48j, 0:288:48j]
+Y, X = np.mgrid[0:288:36j, 0:288:36j]
 
 
 U = SDMmap_vec_gradient[:,:,0]
 
 V = SDMmap_vec_gradient[:,:,1]
 
-U = U[::6,::6]/120
-V = V[::6,::6]/120
-
-U = np.around(U, decimals=2)
-V = np.around(V, decimals=2)
+U = U[::8,::8]/120
+V = V[::8,::8]/120
 
 print U.shape
 print U
