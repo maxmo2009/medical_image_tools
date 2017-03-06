@@ -25,6 +25,9 @@ data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
 data = np.load(data_p +  '/data/clean_datas.npy').astype(np.float32)
+
+# label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
+# data = np.load(data_p +  '/miccai_traindata/data_1.npy').astype(np.float32)
 print "The total number of training data is:"
 print data.shape
 
@@ -35,8 +38,8 @@ data,label = shuffle(data,label,random_state=1)
 data = np.delete(data, [20],0)
 label = np.delete(label, [20],0)
 
-d_train = data[1:40,:,:,0]
-l_train = label[1:40,:,:,0]
+d_train = data[1:4,:,:,0]
+l_train = label[1:4,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
@@ -101,8 +104,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_p)
-np.save(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_v)
+# np.save(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_p)
+# np.save(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy', f_v)
 
 
 

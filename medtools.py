@@ -162,7 +162,11 @@ def get_vecF_from_label_abs(points,label): #less accuracy
     jj = jj + 1
   return v_l
 
-
+def get_trajectory_first_derivitive(points):
+  pt = np.array(points)
+  tck, u = splprep(pt.T, u=None, s=0.0, per=1) 
+  D1_mash = np.linspace(u.min(), u.max(), 1000)
+  pass
 
 
 def get_norm_by_spline_first_derivitive(points,angle =True):
@@ -365,6 +369,7 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   return np.array(final_patch), np.array(final_vec)
 
 def get_limited_circle_gradient_SDMmap(label,ee=25):
+  ssss = label.shape
   e = ee
   selem = disk(e)
   filled_label = ndimage.binary_fill_holes(label).astype(int)
@@ -376,7 +381,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
 
   p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
 
-  mask_label_contour = dilation(PtToMap(p_l,(288,288)), selem)
+  mask_label_contour = dilation(PtToMap(p_l,ssss), selem) ## size
 
   inner_mask = mask_label_contour*filled_label
   out_mask =  mask_label_contour - inner_mask

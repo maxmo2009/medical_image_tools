@@ -53,8 +53,8 @@ cleaned_label = cleaned_label[ki2]
 print cleaned_label.shape
 print cleaned_data.shape
   
-np.save(data_p + '/data/clean_datas.npy', cleaned_data)
-np.save(data_p + '/data/clean_labels.npy', cleaned_label)
+# np.save(data_p + '/data/clean_datas.npy', cleaned_data)
+# np.save(data_p + '/data/clean_labels.npy', cleaned_label)
 
 
 

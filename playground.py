@@ -11,8 +11,13 @@ import matplotlib.pyplot as plt
 from medpy.io import load
 from sklearn.utils import shuffle
 
+from scipy.interpolate import splprep, splev,splrep
 
 
+def get_first_derivitat(pt):
+  tck, u = interpolate.splrep(pt.T[0], pt.T[1], s=0)
+  xy = splev(u, tck, der=1)
+  return l2_norm(np.array(xy).T[-1])
 
 
 
@@ -23,14 +28,18 @@ a = np.array([[1,1,1,1],
  	          [2,2,2,2],
 	          [1,1,0,1],
  	          [2,1,2,2]])
-b = np.array([[1,2],
- 	           [2,1],
- 	           [2,3],
- 	           [3,3]])
-c,d = shuffle(a,b,random_state=1)
+b = np.array([[1,1],
+ 	           [2,2],
+ 	           [3,3],
+ 	           [4,4],
+ 	           [5,5]])
 
-print c
-print d
+
+
+tck= splrep(b.T[0], b.T[1], s=0)
+# D1_mash = np.linspace(u.min(), u.max(), 1000)
+xy = splev(, tck, der=1)
+print l2_norm(np.array(xy).T[-1])
 
 exit()
 # plt.imshow(a)
