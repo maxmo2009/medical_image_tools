@@ -1,5 +1,5 @@
-import tensorflow as tf 
-import tensorlayer as tl 
+import tensorflow as tf
+import tensorlayer as tl
 import numpy as np
 from medtools import *
 import matplotlib.pyplot as plt
@@ -8,10 +8,9 @@ from sklearn.utils import shuffle
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 model_n = '1_50_cleans_limitedCircle_PreSin_regula'
-# 
+#
 
 # with tf.device('/gpu:0'):
-
 
 patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
@@ -115,17 +114,17 @@ saver = tf.train.Saver()
 # start_time = time.time()
 # for i in range(2000):
 #   total_loss = 0
- 
+
 #   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
 #     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
-    
+
 #     # total_loss = total_loss + los
 #     # print 'This is label: ', y_train
 #     # print 'This is predict: ', res
 #     # print 'This is loss: ', los
 #   # if i%10 == 0:
-    
-#   print "EPOCH: " + str(i) + ":" 
+
+#   print "EPOCH: " + str(i) + ":"
 #   print "The total lose is:" + str(los)
 #   if i%50 == 0:
 #     saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
@@ -135,7 +134,7 @@ saver = tf.train.Saver()
 
 # saver.save(sess, '../models/presin_1_50_unreg/final_DEEP_SNAKE_' + model_n)
 # elapsed_time = time.time() - start_time
-# print "time last for: " 
+# print "time last for: "
 # print elapsed_time
 
 
@@ -176,9 +175,10 @@ plt.show()
 
 point_list = []
 angle = 0
+
+
 for i in range(300):
-  
- 
+
   if i == 0:
     print "first iteration"
     xx,yy = single_point
@@ -210,9 +210,9 @@ for i in range(300):
   ress = sess.run(denseO.outputs,feed_dict={xi:patch})
   print 'rel ang:', ress
   abs_vec = rotate_vector(ress[0],angle)
-  
+
   single_point = single_point + abs_vec
-  
+
   abs_vec_norm = l2_norm(abs_vec)
 
   angle = normToAngel(abs_vec_norm)
