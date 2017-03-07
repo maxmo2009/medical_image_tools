@@ -74,5 +74,5 @@ train_patch, train_vecs = corp_accdTo_mask(single_data,SDMmap_corp_gradient,SDMm
 print train_patch.shape
 print train_vecs.shape
 
-np.save(data_p + '/train_data/patchs_miccai_only_1.npy', train_data)
+np.save(data_p + '/train_data/patchs_miccai_only_1.npy', train_patch)
 np.save(data_p + '/train_data/vecs_miccai_only_1.npy', train_vecs)
