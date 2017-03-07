@@ -7,31 +7,34 @@ import time
 from sklearn.utils import shuffle
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '1_50_cleans_limitedCircle_PreSin_regula'
+model_n = '1_miccai_limitedCircle'
 # 
 
 # with tf.device('/gpu:0'):
 
 
-patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+# patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+# vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 
+# patches = np.load(data_p + '/train_data/patchs_miccai_only_1.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_miccai_only_1.npy').astype(np.float32)
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
-patches = patches[:,:,:,np.newaxis]
+# patches = patches[:,:,:,np.newaxis]
 # test_patches = test_patches[:,:,:,np.newaxis]
 
-print patches.shape
+# print patches.shape
 print vecs.shape
 
 
 tf.set_random_seed(0)
 tl.layers.set_name_reuse(True)
 
-n,x,y,c = patches.shape
+n,x,y,c = (100,64,64,1)
+# n,x,y,c = patches.shape
 
-batch_size = 512
+batch_size = 256
 
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
@@ -113,7 +116,7 @@ saver = tf.train.Saver()
 
 #################################################################################
 # start_time = time.time()
-# for i in range(2000):
+# for i in range(1000):
 #   total_loss = 0
  
 #   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
@@ -127,13 +130,13 @@ saver = tf.train.Saver()
     
 #   print "EPOCH: " + str(i) + ":" 
 #   print "The total lose is:" + str(los)
-#   if i%50 == 0:
-#     saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+#   # if i%50 == 0:
+#   #   saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
 #   if los <= 0.5:
 #     break
 
 
-# saver.save(sess, '../models/presin_1_50_unreg/final_DEEP_SNAKE_' + model_n)
+# saver.save(sess, '../models/miccai_only_1/final_DEEP_SNAKE_' + model_n)
 # elapsed_time = time.time() - start_time
 # print "time last for: " 
 # print elapsed_time
@@ -142,16 +145,17 @@ saver = tf.train.Saver()
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 
-saver.restore(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_1_50_cleans_limitedCircle_PreSin_regula_at_0.579801')
+saver.restore(sess, '../models/miccai_only_1/final_DEEP_SNAKE_1_miccai_limitedCircle')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-data = np.load(data_p + '/data/clean_datas.npy').astype(np.float32)
-label = np.load(data_p + '/data/clean_labels.npy').astype(np.int32)
+data = np.load(data_p + '/miccai_traindata/data_1.npy').astype(np.float32)
+label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
 data,label = shuffle(data,label,random_state=1)
 print "The shape of test pathes is:"
 print data.shape
+exit()
 # train_label = label[6,:,:,0]
 test_label = label[44,:,:,0]
 
