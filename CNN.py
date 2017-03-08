@@ -14,21 +14,24 @@ from skimage import measure
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '1_50_cleans_limitedCircle_PreSin_regula'
+model_n = "miccai_1"
+# model_n = '1_50_cleans_limitedCircle_PreSin_regula'
 #
 
 # with tf.device('/gpu:0'):
 
 print("Loading patches")
 # patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/patchs_miccai_only_1.npy').astype(np.float32)
 print("Loading vecs")
-vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+# vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/vecs_miccai_only_1.npy').astype(np.float32)
 print("Loading data SUCCESS")
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
-#patches = patches[:,:,:,np.newaxis]
+patches = patches[:,:,:,np.newaxis]
 # test_patches = test_patches[:,:,:,np.newaxis]
 
 # print (patches.shape)
@@ -38,8 +41,8 @@ print (vecs.shape)
 tf.set_random_seed(0)
 tl.layers.set_name_reuse(True)
 
-# n,x,y,c = patches.shape
-n,x,y,c = (791523,64,64,1)
+n,x,y,c = patches.shape
+# n,x,y,c = (791523,64,64,1)
 
 batch_size = 512
 
@@ -122,12 +125,12 @@ saver = tf.train.Saver()
 #   qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
 
 #################################################################################
-# start_time = time.time()
-# for i in range(2000):
-#   total_loss = 0
+start_time = time.time()
+for i in range(2000):
+    total_loss = 0
 
-#   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
-#     _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
+    for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
+        _, los = sess.run([train_step,qrdic],feed_dict={xi:X_train,y_:y_train})
 
 #     # total_loss = total_loss + los
 #     # print 'This is label: ', y_train
@@ -135,23 +138,25 @@ saver = tf.train.Saver()
 #     # print 'This is loss: ', los
 #   # if i%10 == 0:
 
-#   print "EPOCH: " + str(i) + ":"
-#   print "The total lose is:" + str(los)
-#   if i%50 == 0:
-#     saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
-#   if los <= 0.5:
-#     break
+    print "EPOCH: " + str(i) + ":"
+    print "The total lose is:" + str(los)
+    # if i%50 == 0:
+    #     saver.save(sess, '../models/presin_1_50_unreg/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+    if los <= 0.5:
+        break
 
 
-# saver.save(sess, '../models/presin_1_50_unreg/final_DEEP_SNAKE_' + model_n)
-# elapsed_time = time.time() - start_time
-# print "time last for: "
-# print elapsed_time
+savepath = "/home/dsigpu5/Desktop/work_space/med_image_src/miccai_only_1"
+saver.save(sess, savepath + '/final_DEEP_SNAKE_' + model_n)
+elapsed_time = time.time() - start_time
+print "time last for: "
+print elapsed_time
 
 
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 
+'''
 originpath = "/home/dsigpu5/Desktop/work_space/med_image_src"
 saver.restore(sess, originpath + '/models/presin_1_50_unreg/DEEP_SNAKE_1_50_cleans_limitedCircle_PreSin_regula_at_0.579801')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
@@ -349,5 +354,4 @@ print(overlap_sumb / overlap_numb)
 # without black magic: 0.8742, 0.8819, 0.9184
 # with black magic:    0.8798, 0.8843, 0.9215
 
-
-
+'''
