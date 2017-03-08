@@ -445,7 +445,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
 
 # black magic
 def get_first_der(ptlist):
-    mom = 4
+    mom = 6
     eta = 0.35
     pt = np.asarray(ptlist[-mom:])
     dr = np.zeros((mom-1,2))
@@ -460,34 +460,6 @@ def get_first_der(ptlist):
         pd = cd
     vec /= mom - 2
     return vec
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # circle_raw = np.ones((256,256))
