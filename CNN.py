@@ -8,9 +8,21 @@ import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
 from medpy.metric.binary import dc
+from medpy.metric.binary import precision
+from medpy.metric.binary import recall
 from scipy import ndimage
 from PIL import Image, ImageDraw
 from skimage import measure
+import pymongo
+from pymongo import MongoClient
+import gridfs
+from datetime import datetime
+
+client = MongoClient('146.169.33.34', 27020)
+db = client.AdvanceGan
+db.authenticate('xiaobai', 'xiaobai')
+uuid = datetime.utcnow()
+mfs = gridfs.GridFS(db, collection="MedicalCardcEvaluateImg")
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
@@ -167,30 +179,27 @@ saver.restore(sess, originpath + '/models/miccai_f30/final_DEEP_SNAKE_1_miccai_l
 data = np.load(data_p + '/data/datas_miccai_125.npy').astype(np.float32)
 label = np.load(data_p + '/data/labels_miccai_125.npy').astype(np.int32)
 data,label = shuffle(data,label,random_state=3)
-print "The shape of test pathes is:"
+print "The shape of teEvaluation 1: st pathes is:"
 print data.shape
 
 drop = 0
-overlap_sum = 0
-overlap_sum2 = 0
-overlap_sumb = 0
-overlap_num = 0
-overlap_numb = 0
 
+
+sensitivity = list()
+specificity = list()
+ppv = list()
+npv = list()
+jaccard = list()
+dice = list()
 
 for idx in range(30, data.shape[0]):
     try:
-        # train_label = label[6,:,:,0]
         test_label = label[idx,:,:,0]
-
-        # train_data = data[6,:,:,0]
         test_data = data[idx,:,:,0]
 
 
         test_points = generate_psedu_points(test_label)
-        # test_points = np.nonzero(test_label).T
         single_point = test_points[5]
-        # print "Contour points: %4d" % (len(test_points))
 
         # norm_list = get_norm_by_spline_first_derivitive(list(test_points))
         # an_list = normListToAngelList(norm_list)
@@ -200,12 +209,8 @@ for idx in range(30, data.shape[0]):
         v = SDMmap_vec_gradient[y,x,1]
         init_an = normToAngel((u,v))
 
-        # plt.imshow(test_label,cmap = 'gray',interpolation = 'nearest')
-        # plt.show()
-
         point_list = []
         angle = 0
-
 
         for i in range(1000):
           if i % 100 == 0:
@@ -261,12 +266,16 @@ for idx in range(30, data.shape[0]):
               #    exit()
               # print 'abs ang:', angle
               # p_m = PtOnMap(single_point,test_label.shape)
+
+          # if i % 30 == 0:
+          #     plt.imshow(patch[0,:,:,0], cmap="gray")
+          #     plt.savefig("figures/patch_%4d_%4d"%(idx, i))
           single_point = single_point + abs_vec
           point_list.append(single_point)
 
-
         label_fill = ndimage.binary_fill_holes(test_label).astype(int)
 
+        # find point trajectory circle
         threshold = 3
         period = 250
         min = 1000000
@@ -281,42 +290,66 @@ for idx in range(30, data.shape[0]):
                     period = len(point_list) - j
                     break
 
-        # print(period)
-        # continue
 
+
+        # segmentation result
         segmt = np.reshape(np.around(point_list[-period:]), (-1,)).astype(int)
         segmt = list(segmt)
         img = Image.new('L', test_data.shape, 0)
         ImageDraw.Draw(img).polygon(segmt, outline=1)
         outline = np.array(img)
 
-        segmt_fill = ndimage.binary_fill_holes(outline).astype(int)
-        # black magic 1
-        segmt_fill2 = segmt_fill - outline
 
+        # black magic 1
+        segmt_fill = ndimage.binary_fill_holes(outline).astype(int)
+        # segmt_fill2 = segmt_fill - outline
         # plt.imshow(segmt_fill2,cmap = 'gray',interpolation = 'nearest')
         # plt.savefig("figures/result_%4d_segmt.png" % (idx))
-        # print(segmt_fill)
-        # exit()
 
-        # plt.imshow(test_data,cmap = 'gray',interpolation = 'nearest')
-        # plt.show()
+
+        ###########################################################################
+        # Evaluation 1: sensitivity = recall
+        sens = recall(label_fill, segmt_fill)
+        sensitivity.append(sens)
+
+        # Evaluation 2: specificity
+        negative = label_fill.size - np.sum(label_fill)
+        truenega = 0.
+        for ii in range(label_fill.shape[0]):
+            for ji in range(label_fill.shape[1]):
+                if label_fill[ii,ji] == 0 and segmt_fill[ii, ji] == 0:
+                    truenega += 1.
+        spec = truenega / negative
+        specificity.append(spec)
+
+        # Evaluation 3: PPV = precision
+        pre = precision(label_fill, segmt_fill)
+        ppv.append(pre)
+
+        # Evaluation 4: NPV
+        negative_predict = segmt_fill.size - np.sum(segmt_fill)
+        negapre = truenega / negative_predict
+        npv.append(negapre)
+
+        # Evaluation 5: Jaccard
+        truepos = 0.
+        for ii in range(label_fill.shape[0]):
+            for ji in range(label_fill.shape[1]):
+                if label_fill[ii,ji] == 1 and segmt_fill[ii, ji] == 1:
+                    truepos += 1.
+        jacc = truepos / (np.sum(label_fill) + np.sum(segmt_fill) - truepos)
+        jaccard.append(jacc)
+
+        # Evaluation 6: dice coefficient
         overlap = dc(label_fill, segmt_fill)
-        overlap2 = dc(label_fill, segmt_fill2)
-        # black magic 4-1
-        overlapf = max(overlap, overlap2)
+        dice.append(overlap)
+        ###########################################################################
 
-        print("Index: %4d, Overlap: %.4f"%(idx, overlapf))
-        overlap_sum += overlap
-        overlap_sum2 += overlap2
-        overlap_sumf += overlapf
-        if overlapf > 0.8:
-            overlap_sumb += overlapf
-            overlap_numb += 1
-        overlap_num += 1
+        print("Index: %4d, Overlap: %.4f"%(idx, overlap))
 
-        p_mm = PtToMap(point_list[-period:],test_label.shape)
 
+        ###########################################################################
+        # save img
         red_label  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         red_label[:,:,0] = contour(test_label)
 
@@ -324,6 +357,7 @@ for idx in range(30, data.shape[0]):
         for s in range(0, 3):
             grey_data[:,:,s] = test_data.copy()
 
+        p_mm = PtToMap(point_list[-period:],test_label.shape)
         yellow_seg = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         for s in range(0, 3):
             yellow_seg[:,:,s] = p_mm.copy()
@@ -331,20 +365,36 @@ for idx in range(30, data.shape[0]):
         img_data = grey_data*3 + red_label + yellow_seg
         print(np.max(img_data))
         plt.imshow(img_data/img_data.max())
-        # black magic 4-2
-        if overlap > overlap2:
-            plt.savefig("figures/result_1_%4d_%.4f.png" % (idx, overlapf))
-        else:
-            plt.savefig("figures/result_2_%4d_%.4f.png" % (idx, overlapf))
+        plt.savefig("figures/result_%4d_%.4f.png" % (idx, overlap))
+
+        # red_label2  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+        # red_label2[:,:,0] = test_label
+        # img_data2 = grey_data*3 + red_label2
+        # plt.imshow(img_data2/img_data2.max())
+        # plt.savefig("figures/result_%4d_label.png" % (idx))
+        ###########################################################################
 
 
+        ###########################################################################
+        # save to mongodb
+        current = datetime.utcnow()
+        # labelimgid = mfs.put((img_data2/img_data2.max()).astype(np.float32).tostring(), filename="label-%s-%4d"%(repr(current), idx))
+        resultimgid = mfs.put((img_data/img_data.max()).astype(np.float32).tostring(), filename="label-%s-%4d"%(repr(current), idx))
+        dbresult = db.MedicalCardcEvaluateLog.insert_one({
+            "uuid": uuid,
+            "timestamp": current,
+            "imgid": idx,
+            # "labelimgid": labelimgid,
+            "resultimgid": resultimgid,
+            "sensitivity": sens,
+            "specificity": spec,
+            "ppv": pre,
+            "npv": negapre,
+            "jaccard": jacc,
+            "dc": overlap,
+            })
+        ###########################################################################
 
-        red_label2  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
-        red_label2[:,:,0] = test_label
-        img_data2 = grey_data*3 + red_label2
-        plt.imshow(img_data2/img_data2.max())
-        plt.savefig("figures/result_%4d_label.png" % (idx))
-        # print(point_list)
 
     except (IndexError):
         drop += 1
@@ -353,7 +403,6 @@ for idx in range(30, data.shape[0]):
         red_label  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         print(test_label.shape)
         red_label[:,:,0] = contour(test_label)
-        # red_label[:,:,0] = test_label
         grey_data  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         for s in range(0, 3):
             grey_data[:,:,s] = test_data.copy()
@@ -363,10 +412,20 @@ for idx in range(30, data.shape[0]):
         plt.imshow(img_data/img_data.max())
         plt.savefig("figures/drop_%4d.png" % (idx))
 
-print(overlap_sum / overlap_num)
-print(overlap_sum2 / overlap_num)
-print(overlap_sumf / overlap_num)
-print(overlap_sumb / overlap_numb)
+
+
+print("p mean: \t %.4f" % (np.mean(sensitivity)))
+print("p median: \t %.4f" % (np.median(sensitivity)))
+print("q mean: \t %.4f" % (np.mean(specificity)))
+print("q median: \t %.4f" % (np.median(specificity)))
+print("PPV mean: \t %.4f" % (np.mean(ppv)))
+print("PPV median: \t %.4f" % (np.median(ppv)))
+print("NPV mean: \t %.4f" % (np.mean(npv)))
+print("NPV median: \t %.4f" % (np.median(npv)))
+print("J mean: \t %.4f" % (np.mean(jaccard)))
+print("J median: \t %.4f" % (np.median(jaccard)))
+print("D mean: \t %.4f" % (np.mean(dice)))
+print("D median: \t %.4f" % (np.median(dice)))
 
 # round1: without black magic 2: 0.8742, 0.8819, , 0.9184
 # round2: with black magic 2:    0.8798, 0.8843, , 0.9215
@@ -374,3 +433,4 @@ print(overlap_sumb / overlap_numb)
 # round3: new dataset: without black magic 2:  0.8866, 0.9199, , 0.9199
 # round4: new dataset: with black magic 2   :  0.9557, 0.9366, , 0.9366
 
+# round 5: 0.9557 0.9366 0.9558 0.9558
