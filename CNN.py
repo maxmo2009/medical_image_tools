@@ -26,35 +26,35 @@ mfs = gridfs.GridFS(db, collection="MedicalCardcEvaluateImg")
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = "miccai_1"
+# model_n = "miccai_1"
 # model_n = '1_50_cleans_limitedCircle_PreSin_regula'
 #
 
 # with tf.device('/gpu:0'):
 
-print("Loading patches")
+# print("Loading patches")
 # patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
-patches = np.load(data_p + '/train_data/patchs_miccai_only_1.npy').astype(np.float32)
-print("Loading vecs")
+# patches = np.load(data_p + '/train_data/patchs_miccai_only_1.npy').astype(np.float32)
+# print("Loading vecs")
 # vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/vecs_miccai_only_1.npy').astype(np.float32)
-print("Loading data SUCCESS")
+# vecs = np.load(data_p + '/train_data/vecs_miccai_only_1.npy').astype(np.float32)
+# print("Loading data SUCCESS")
 
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
-patches = patches[:,:,:,np.newaxis]
+# patches = patches[:,:,:,np.newaxis]
 # test_patches = test_patches[:,:,:,np.newaxis]
 
 # print (patches.shape)
-print (vecs.shape)
+# print (vecs.shape)
 
 
 tf.set_random_seed(0)
 tl.layers.set_name_reuse(True)
 
-n,x,y,c = patches.shape
-# n,x,y,c = (791523,64,64,1)
+# n,x,y,c = patches.shape
+n,x,y,c = (791523,64,64,1)
 
 batch_size = 512
 
@@ -171,13 +171,13 @@ print elapsed_time
 '''
 
 originpath = "/home/dsigpu5/Desktop/work_space/med_image_src"
-saver.restore(sess, originpath + '/models/miccai_f30/final_DEEP_SNAKE_1_miccai_limitedCircle')
+saver.restore(sess, originpath + '/models/miccai_mix_set_2_3/final_DEEP_SNAKE_1_2_miccai_limitedCircle')
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-data = np.load(data_p + '/data/datas_miccai_125.npy').astype(np.float32)
-label = np.load(data_p + '/data/labels_miccai_125.npy').astype(np.int32)
+data = np.load(data_p + '/data/datas_miccai_110_mixture.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels_miccai_110_mixture.npy').astype(np.int32)
 data,label = shuffle(data,label,random_state=3)
 print "The shape of teEvaluation 1: st pathes is:"
 print data.shape
@@ -192,7 +192,7 @@ npv = list()
 jaccard = list()
 dice = list()
 
-for idx in range(30, data.shape[0]):
+for idx in range(0, 15):
     try:
         test_label = label[idx,:,:,0]
         test_data = data[idx,:,:,0]
