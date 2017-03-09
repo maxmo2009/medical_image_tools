@@ -14,34 +14,34 @@ from sklearn.utils import shuffle
 from scipy.interpolate import splprep, splev,splrep
 
 
-def get_first_derivitat(pt):
-  tck, u = interpolate.splrep(pt.T[0], pt.T[1], s=0)
-  xy = splev(u, tck, der=1)
-  return l2_norm(np.array(xy).T[-1])
+# def get_first_derivitat(pt):
+#   tck, u = interpolate.splrep(pt.T[0], pt.T[1], s=0)
+#   xy = splev(u, tck, der=1)
+#   return l2_norm(np.array(xy).T[-1])
 
 
 
 
 
 
-a = np.array([[1,1,1,1],
- 	          [2,2,2,2],
-	          [1,1,0,1],
- 	          [2,1,2,2]])
-b = np.array([[1,1],
- 	           [2,2],
- 	           [3,3],
- 	           [4,4],
- 	           [5,5]])
+# a = np.array([[1,1,1,1],
+#  	          [2,2,2,2],
+# 	          [1,1,0,1],
+#  	          [2,1,2,2]])
+# b = np.array([[1,1],
+#  	           [2,2],
+#  	           [3,3],
+#  	           [4,4],
+#  	           [5,5]])
 
 
 
-tck= splrep(b.T[0], b.T[1], s=0)
-# D1_mash = np.linspace(u.min(), u.max(), 1000)
-xy = splev(, tck, der=1)
-print l2_norm(np.array(xy).T[-1])
+# tck= splrep(b.T[0], b.T[1], s=0)
+# # D1_mash = np.linspace(u.min(), u.max(), 1000)
+# xy = splev(, tck, der=1)
+# print l2_norm(np.array(xy).T[-1])
 
-exit()
+# exit()
 # plt.imshow(a)
 # plt.show()
 # exit()
@@ -128,17 +128,18 @@ exit()
 
 path = "/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/challenge_training/SC-HF-I-1/IM-0002-0009.dcm"
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-label = np.load(data_p + '/data/labels.npy').astype(np.int32)
-data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
+label = np.load(data_p + '/data/labels_miccai_125.npy').astype(np.int32)
+data = np.load(data_p +  '/data/datas_miccai_125.npy').astype(np.float32)
 
 
-plt.imshow(data[5,:,:,0],cmap = 'gray',interpolation = 'nearest')
+plt.imshow(data[32,:,:,0],cmap = 'gray',interpolation = 'nearest')
 plt.show()
 
-# label_SDM, label_abs_SDM = get_SDMmap(label[5,:,:,0])
-SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
-
+label_SDM, label_abs_SDM = get_SDMmap(label[32,:,:,0])
+# SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
+SDMmap_vec_gradient = get_gradient_SDMmap(label_SDM)
 Y, X = np.mgrid[0:288:36j, 0:288:36j]
+
 
 
 U = SDMmap_vec_gradient[:,:,0]
@@ -155,7 +156,7 @@ plt.title('Arrows scale with plot width, not view')
 Q = plt.quiver(X, Y, U, V,scale=1)
 # qk = plt.quiverkey(Q, 1, 1, 2, r'$2 \frac{m}{s}$', labelpos='E',
                     # coordinates='figure')
-plt.show()
+plt.savefig('sdm.png')
 
 exit()
 
