@@ -32,8 +32,8 @@ idx_array = np.array(idx_array)
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
-label = np.load(data_p + '/data/labels_miccai_110_mixture.npy').astype(np.int32)
-data = np.load(data_p +  '/data/datas_miccai_110_mixture.npy').astype(np.float32)
+label = np.load(data_p + '/data/miccai/label_set_2_3.npy').astype(np.int32)
+data = np.load(data_p +  '/data/miccai/data_set_2_3.npy').astype(np.float32)
 
 # label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
 # data = np.load(data_p +  '/miccai_traindata/data_1.npy').astype(np.float32)
@@ -42,12 +42,15 @@ print data.shape
 
 # data,label = remove_empty_label(data,label)
 
-data,label = shuffle(data,label,random_state=3)
+# data,label = shuffle(data,label,random_state=1)
+
+# d_train = np.delete(data, [20],0)
+# l_train = np.delete(label, [20],0)
+
+d_train = data[:,:,:,0]
+l_train = label[:,:,:,0]
 
 
-
-d_train = data[idx_array,:,:,0]
-l_train = label[idx_array,:,:,0]
 print "The total number of training data after shrink is:"
 print data.shape
 
@@ -110,8 +113,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/miccai_patch_mix30_set_1_3.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
-np.save(data_p + '/train_data/miccai_vecs_mix30_set_1_3.npy', f_v) 
+np.save(data_p + '/train_data/miccai_individual_patch_set_2_3.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
+np.save(data_p + '/train_data/miccai_individual_vecs_set_2_3.npy', f_v) 
 
 
 

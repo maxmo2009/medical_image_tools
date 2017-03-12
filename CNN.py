@@ -7,7 +7,7 @@ import time
 from sklearn.utils import shuffle
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-model_n = '1_2_miccai_limitedCircle'
+model_n = 'miccai_1_3'
 # 
 
 # with tf.device('/gpu:0'):
@@ -16,8 +16,8 @@ model_n = '1_2_miccai_limitedCircle'
 # patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 # vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 
-patches = np.load(data_p + '/train_data/miccai_patch_mix30_set_1_2.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/miccai_vecs_mix30_set_1_2.npy').astype(np.float32)
+patches = np.load(data_p + '/train_data/miccai_individual_patch_set_1_3.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/miccai_individual_vecs_set_1_3.npy').astype(np.float32)
 # test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
 # test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
 
@@ -35,7 +35,6 @@ tl.layers.set_name_reuse(True)
 n,x,y,c = patches.shape
 
 batch_size = 512
-
 xi=tf.placeholder(tf.float32, shape=[None, x, y, 1])
 y_=tf.placeholder(tf.float32, shape=[None, 2])
 
@@ -117,7 +116,7 @@ saver = tf.train.Saver()
 #################################################################################
 start_time = time.time()
 # saver.restore(sess, '../models/miccai_f30/final_DEEP_SNAKE_1_miccai_limitedCircle')
-for i in range(1000):
+for i in range(500):
   total_loss = 0
  
   for X_train, y_train in tl.iterate.minibatches(patches, vecs, batch_size, shuffle=True):
@@ -132,12 +131,12 @@ for i in range(1000):
   print "EPOCH: " + str(i) + ":" 
   print "The total lose is:" + str(los)
   if i%50 == 0:
-    saver.save(sess, '../models/miccai_mix_set_1_2/temp/DEEP_SNAKE_' + model_n + '_at_' + str(los))
+    saver.save(sess, '../models/miccai_individual_1_3/temp/DEEP_SNAKE_' + model_n + '_at_' + str(los))
   if los <= 0.5:
     break
 
 
-saver.save(sess, '../models/miccai_mix_set_1_2/final_DEEP_SNAKE_' + model_n)
+saver.save(sess, '../models/miccai_individual_1_3/final_DEEP_SNAKE_' + model_n)
 elapsed_time = time.time() - start_time
 print "time last for: " 
 print elapsed_time

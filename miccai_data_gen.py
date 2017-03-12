@@ -28,7 +28,7 @@ def pick_corr(imagep,B):
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-opath = '/media/dsigpu5/SSD/YUANHAN/data/CAP_data/subsetTraining2/'
+opath = '/media/dsigpu5/SSD/YUANHAN/data/CAP_data/subsetTraining_individual/set_1_3/'
 # contour_path = '/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/train_label/TrainingDataContours/SC-N-02/contours-manual/IRCCI-expert/'
 
 ext_dcm = 'dcm'
@@ -71,8 +71,8 @@ print data_.shape
 print label_.shape 
 
 
-np.save(data_p + '/data/datas_miccai_110_mixture.npy', data_)
-np.save(data_p + '/data/labels_miccai_110_mixture.npy', label_)
+np.save(data_p + '/data/miccai/data_set_1_3.npy', data_)
+np.save(data_p + '/data/miccai/label_set_1_3.npy', label_)
 
 
 
