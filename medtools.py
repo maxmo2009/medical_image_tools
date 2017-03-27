@@ -22,6 +22,17 @@ from scipy.interpolate import splprep, splev
 patch_size = 32 #pathcsize * 2
 
 
+def weight(img):
+    imgt = img.copy()
+    for ii in range(0, img.shape[0]):
+        for ji in range(0, img.shape[1]):
+            if img[ii][ji] > 0.8 \
+                    and ii > 0 and ii < img.shape[0] - 1  \
+                    and ji > 0 and ji < img.shape[1] - 1:
+                imgt[ii-1, ji-1] = 1
+                imgt[ii  , ji-1] = 1
+                imgt[ii-1, ji  ] = 1
+    return imgt
 
 
 def length(v):
@@ -74,7 +85,7 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 15,ee = 10): #ee: how far is going to dialiated. k: distance between each point
+def generate_psedu_points(label, k = 15,ee = 10): #ee: how far is going to dialiated. k: distance between each point
 
   e = ee
   selem = disk(e)
@@ -382,7 +393,7 @@ def contour(label):
 
       p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
 
-      label_contour = PtToMap(p_l,(288,288))
+      label_contour = PtToMap(p_l,label.shape)
       return label_contour
   except (IndexError):
       return label
@@ -400,7 +411,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
 
   p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
 
-  mask_label_contour = dilation(PtToMap(p_l,(288,288)), selem)
+  mask_label_contour = dilation(PtToMap(p_l,label.shape), selem)
 
   inner_mask = mask_label_contour*filled_label
   out_mask =  mask_label_contour - inner_mask

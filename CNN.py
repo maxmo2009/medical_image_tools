@@ -11,12 +11,15 @@ from medpy.metric.binary import dc
 from medpy.metric.binary import precision
 from medpy.metric.binary import recall
 from scipy import ndimage
+from scipy.ndimage import interpolation
 from PIL import Image, ImageDraw
 from skimage import measure
+from skimage import transform
 import pymongo
 from pymongo import MongoClient
 import gridfs
 from datetime import datetime
+import sys
 
 client = MongoClient('146.169.33.34', 27020)
 db = client.AdvanceGan
@@ -169,18 +172,32 @@ print elapsed_time
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 '''
+infile = open("model_SCD.txt", 'r')
+models = list()
+for line in infile:
+    models.append(line.replace('\n',''))
+
+modelid = int(sys.argv[1])
 
 originpath = "/home/dsigpu5/Desktop/work_space/med_image_src"
-saver.restore(sess, originpath + '/models/miccai_mix_set_2_3/final_DEEP_SNAKE_1_2_miccai_limitedCircle')
+# saver.restore(sess, originpath + '/models/SCD_individual_1_3/temp/DEEP_SNAKE_miccai_1_3_at_0.838227')
+# saver.restore(sess, originpath + '/models/SCD_individual_1_2/final_DEEP_SNAKE_miccai_1_3')
+# saver.restore(sess, originpath + '/models/SCD_individual_2_3/final_DEEP_SNAKE_miccai')
+saver.restore(sess, originpath + models[modelid])
+outfile = open("results/SCD_CNN_vector_%1d.txt"%(modelid), 'w')
+print(originpath + models[modelid])
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
 
 
 
-data = np.load(data_p + '/data/datas_miccai_110_mixture.npy').astype(np.float32)
-label = np.load(data_p + '/data/labels_miccai_110_mixture.npy').astype(np.int32)
-data,label = shuffle(data,label,random_state=3)
-print "The shape of teEvaluation 1: st pathes is:"
-print data.shape
+# data = np.load(data_p + '/data/miccai/test/data_set_%1d.npy'%(modelid+1)).astype(np.float32)
+# label = np.load(data_p + '/data/miccai/test/label_set_%1d.npy'%(modelid+1)).astype(np.int32)
+data = np.load(data_p + '/data/SCD/data_45.npy').astype(np.float32)
+label = np.load(data_p + '/data/SCD/label_45.npy').astype(np.int32)
+# data,label = shuffle(data,label,random_state=3)
+# print "The shape of teEvaluation 1: st pathes is:"
+# print data.shape
+# exit()
 
 drop = 0
 
@@ -192,14 +209,50 @@ npv = list()
 jaccard = list()
 dice = list()
 
-for idx in range(0, 15):
+for idx in range(32, 33):
+# for idx in range(modelid*15, modelid*15+15):
+# testlist = [24, 29]
+# for idx in testlist:
     try:
-        test_label = label[idx,:,:,0]
-        test_data = data[idx,:,:,0]
+        test_label_origin = label[idx,:,:,0]
+        test_data_origin = data[idx,:,:,0]
+
+        noise = np.random.uniform(size=test_data_origin.shape)
+        ratio = 0.0
+        test_data = (1 - ratio) * test_data_origin + ratio * noise
+
+        # degree = int(sys.argv[2])
+        degree = 0
+        # test_label = np.rot90(test_label_origin, k=k)
+        # test_data = np.rot90(test_data, k=k)
+        test_label = interpolation.rotate(test_label_origin, degree, reshape=False, mode="constant")
+        test_data  = interpolation.rotate(test_data, degree, reshape=False, mode="constant")
+
+        rescale = (288, 288)
+        # test_label = transform.resize(test_label, rescale, preserve_range=True)
+        # test_data = transform.resize(test_data, rescale, preserve_range=True)
 
 
-        test_points = generate_psedu_points(test_label)
-        single_point = test_points[5]
+        ee = 20
+        pos = 0
+        test_points = generate_psedu_points(test_label, ee=ee)
+        # print(test_points.shape)
+        # exit()
+        # single_point = test_points[int((test_points.shape[0]-1)*pos/6)]
+        single_point = test_points[7]
+
+        # print(single_point)
+        # print(type(single_point))
+        # print(single_point.shape)
+
+        # test_points = np.array(np.nonzero(test_label)).T
+        # tindx = np.random.randint(0, test_points.shape[0])
+        # tx = round(np.mean(test_points[:,1]))
+        # ty = round(np.mean(test_points[:,0]))
+        # single_point = np.array([tx, ty])
+        # print(single_point)
+        # print(type(single_point))
+        # print(single_point.shape)
 
         # norm_list = get_norm_by_spline_first_derivitive(list(test_points))
         # an_list = normListToAngelList(norm_list)
@@ -208,9 +261,9 @@ for idx in range(0, 15):
         u = SDMmap_vec_gradient[y,x,0]
         v = SDMmap_vec_gradient[y,x,1]
         init_an = normToAngel((u,v))
-
         point_list = []
         angle = 0
+        vector_err = []
 
         for i in range(1000):
           if i % 100 == 0:
@@ -270,6 +323,11 @@ for idx in range(0, 15):
           # if i % 30 == 0:
           #     plt.imshow(patch[0,:,:,0], cmap="gray")
           #     plt.savefig("figures/patch_%4d_%4d"%(idx, i))
+          gu = SDMmap_vec_gradient[yy,xx,0]
+          gv = SDMmap_vec_gradient[yy,xx,1]
+          pu = abs_vec[0]
+          pv = abs_vec[1]
+          vector_err.append((gu*pu+gv*pv)/(np.sqrt(gu**2+gv**2)*np.sqrt(pu**2+pv**2)))
           single_point = single_point + abs_vec
           point_list.append(single_point)
 
@@ -358,14 +416,21 @@ for idx in range(0, 15):
             grey_data[:,:,s] = test_data.copy()
 
         p_mm = PtToMap(point_list[-period:],test_label.shape)
+        t_mm = PtToMap(point_list[:],test_label.shape)
         yellow_seg = np.zeros((test_label.shape[0], test_label.shape[1], 3))
-        for s in range(0, 3):
-            yellow_seg[:,:,s] = p_mm.copy()
+        trace = np.zeros((test_label.shape[0], test_label.shape[1], 3))
+
+        # yellow_seg[:,:,0] = p_mm.copy()
+        yellow_seg[:,:,1] = p_mm.copy()
+        trace[:,:,1] = weight(t_mm.copy())
 
         img_data = grey_data*3 + red_label + yellow_seg
-        print(np.max(img_data))
+        img_t_data = grey_data*3 + red_label + trace
+
         plt.imshow(img_data/img_data.max())
-        plt.savefig("figures/result_%4d_%.4f.png" % (idx, overlap))
+        plt.savefig("figures/SCD_CNN_vector/result_%4d_%.4f.png" % (idx, overlap))
+        plt.imshow(img_t_data/img_t_data.max())
+        plt.savefig("figures/SCD_CNN_vector/result_%4d_%.4f_trace.png" % (idx, overlap))
 
         # red_label2  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         # red_label2[:,:,0] = test_label
@@ -392,28 +457,66 @@ for idx in range(0, 15):
             "npv": negapre,
             "jaccard": jacc,
             "dc": overlap,
+            "noise_ratio": ratio,
+            "rot": degree,
+            "rescale": rescale,
+            "ee": ee,
+            "single_point_0": single_point[0],
+            "single_point_1": single_point[1],
             })
+        # outfile.write("%4d %.4f %.4f %.4f %.4f %.4f %.4f\n" % (idx, sens, spec, pre, negapre, jacc, overlap))
+        outfile.write("%4d"%(idx))
+        for err in vector_err:
+            outfile.write(" %.4f"%(err))
+        outfile.write("\n")
+        break
         ###########################################################################
 
 
-    except (IndexError):
+    except (IndexError, ValueError):
+    # except (NameError):
         drop += 1
         print("Index: %4d, Drop: No.%2d"%(idx, drop))
 
         red_label  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
-        print(test_label.shape)
+        # print(test_label.shape)
         red_label[:,:,0] = contour(test_label)
         grey_data  = np.zeros((test_label.shape[0], test_label.shape[1], 3))
         for s in range(0, 3):
             grey_data[:,:,s] = test_data.copy()
 
         img_data = grey_data*5 + red_label
-        print(np.max(img_data))
+        # print(np.max(img_data))
         plt.imshow(img_data/img_data.max())
         plt.savefig("figures/drop_%4d.png" % (idx))
 
+        outfile.write("%4d 0.0 0.0 0.0 0.0 0.0 0.0\n"%(idx))
+        sensitivity.append(0.0)
+        specificity.append(0.0)
+        ppv.append(0.0)
+        npv.append(0.0)
+        jaccard.append(0.0)
+        dice.append(0.0)
+
+    '''
+    except:
+        print("p mean: \t %.4f" % (np.mean(sensitivity)))
+        print("p median: \t %.4f" % (np.median(sensitivity)))
+        print("q mean: \t %.4f" % (np.mean(specificity)))
+        print("q median: \t %.4f" % (np.median(specificity)))
+        print("PPV mean: \t %.4f" % (np.mean(ppv)))
+        print("PPV median: \t %.4f" % (np.median(ppv)))
+        print("NPV mean: \t %.4f" % (np.mean(npv)))
+        print("NPV median: \t %.4f" % (np.median(npv)))
+        print("J mean: \t %.4f" % (np.mean(jaccard)))
+        print("J median: \t %.4f" % (np.median(jaccard)))
+        print("D mean: \t %.4f" % (np.mean(dice)))
+        print("D median: \t %.4f" % (np.median(dice)))
+    '''
+    pass
 
 
+outfile.close()
 print("p mean: \t %.4f" % (np.mean(sensitivity)))
 print("p median: \t %.4f" % (np.median(sensitivity)))
 print("q mean: \t %.4f" % (np.mean(specificity)))
