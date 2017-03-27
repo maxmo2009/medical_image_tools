@@ -1,0 +1,3 @@
+/models/SCD_individual_2_3/final_DEEP_SNAKE_miccai
+/models/SCD_individual_1_3/temp/DEEP_SNAKE_miccai_1_3_at_0.838227
+/models/SCD_individual_1_2/final_DEEP_SNAKE_miccai_1_3

@@ -1,0 +1,4 @@
+/models/miccai_individual_2_3/final_DEEP_SNAKE_miccai_2_3
+/models/miccai_individual_1_3/final_DEEP_SNAKE_miccai
+/models/miccai_individual_1_2/final_DEEP_SNAKE_miccai_1_2
+
