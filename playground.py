@@ -22,8 +22,25 @@ from scipy.interpolate import splprep, splev,splrep
 
 
 
+# data_p = '/media/dsigpu5/SSD/YUANHAN/data'
+# label = np.load(data_p + '/data/labels_miccai_125.npy').astype(np.int32)
+# data = np.load(data_p +  '/data/datas_miccai_125.npy').astype(np.float32)
 
 
+
+# label_SDM, label_abs_SDM = get_SDMmap(label[32,:,:,0])
+# label_abs_SDM[label_abs_SDM > 35] = 35
+# # plt.imshow(label_SDM,cmap = 'gray',interpolation = 'nearest')
+# plt.imshow(label_abs_SDM/label_abs_SDM.max())
+# plt.show()
+
+
+
+
+
+
+
+# exit()
 # a = np.array([[1,1,1,1],
 #  	          [2,2,2,2],
 # 	          [1,1,0,1],
@@ -123,7 +140,7 @@ from scipy.interpolate import splprep, splev,splrep
 # qk = plt.quiverkey(Q, 1, 1, 2, r'$2 \frac{m}{s}$', labelpos='E',
 #                    coordinates='figure')
 # plt.show()
-# exit()
+# # exit()
 
 
 path = "/media/dsigpu5/SSD/YUANHAN/data/miccai_lv/micca_LV/challenge_training/SC-HF-I-1/IM-0002-0009.dcm"
@@ -132,19 +149,19 @@ label = np.load(data_p + '/data/labels_miccai_125.npy').astype(np.int32)
 data = np.load(data_p +  '/data/datas_miccai_125.npy').astype(np.float32)
 
 
-plt.imshow(data[32,:,:,0],cmap = 'gray',interpolation = 'nearest')
+plt.imshow(data[5,:,:,0],cmap = 'gray',interpolation = 'nearest')
 plt.show()
 
 label_SDM, label_abs_SDM = get_SDMmap(label[32,:,:,0])
-# SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
-SDMmap_vec_gradient = get_gradient_SDMmap(label_SDM)
+SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(label[5,:,:,0])
+# SDMmap_vec_gradient = get_gradient_SDMmap(label_SDM)
 Y, X = np.mgrid[0:288:36j, 0:288:36j]
 
+label_SDM[label_SDM>50] = 50
 
+U = SDMmap_vec_gradient[:,:,0]*1.5
 
-U = SDMmap_vec_gradient[:,:,0]
-
-V = SDMmap_vec_gradient[:,:,1]
+V = SDMmap_vec_gradient[:,:,1]*1.5
 
 U = U[::8,::8]/120
 V = V[::8,::8]/120
@@ -154,42 +171,44 @@ print U
 
 plt.title('Arrows scale with plot width, not view')
 Q = plt.quiver(X, Y, U, V,scale=1)
+# plt.imshow(label[5,:,:,0],cmap = 'gray',interpolation = 'nearest')
 # qk = plt.quiverkey(Q, 1, 1, 2, r'$2 \frac{m}{s}$', labelpos='E',
                     # coordinates='figure')
-plt.savefig('sdm.png')
+plt.show()
 
 exit()
 
 
 
 
-data_p = '/media/dsigpu5/SSD/YUANHAN/data'
-label = np.load(data_p + '/data/labels.npy').astype(np.int32)
-data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
+# data_p = '/media/dsigpu5/SSD/YUANHAN/data'
+# label = np.load(data_p + '/data/labels.npy').astype(np.int32)
+# data = np.load(data_p +  '/data/datas.npy').astype(np.float32)
 
-d_train = data[8,:,:,0]
-l_train = label[8,:,:,0]
+# d_train = data[8,:,:,0]
+# l_train = label[8,:,:,0]
 
-label_SDM, label_abs_SDM = get_SDMmap(l_train)
-SDMmap_vec_gradient = get_gradient_SDMmap(label_abs_SDM)
+# label_SDM, label_abs_SDM = get_SDMmap(l_train)
+# # SDMmap_vec_gradient = get_gradient_SDMmap(label_abs_SDM)
+# SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(l_train)
 
-U = SDMmap_vec_gradient[:,:,0]
-V = SDMmap_vec_gradient[:,:,1]
-Y, X = np.mgrid[-1:1:288j, -1:1:288j] #generate mash
+# U = SDMmap_vec_gradient[:,:,0]*label_SDM
+# V = SDMmap_vec_gradient[:,:,1]*label_SDM
+# Y, X = np.mgrid[-1:1:288j, -1:1:288j] #generate mash
 
-# U = -1 - X**2 + Y
-# V = 1 + X - Y**2
-speed = np.sqrt(U*U + V*V)
-lw = 5*speed / speed.max()
+# # U = -1 - X**2 + Y
+# # V = 1 + X - Y**2
+# speed = np.sqrt(U*U + V*V)
+# lw = 25*speed / speed.max()
 
 
-fig0, ax0 = plt.subplots()
+# fig0, ax0 = plt.subplots()
+# # strm = ax0.streamplot(X, Y, U, V, color=U, linewidth=lw, cmap=plt.cm.autumn)
 # strm = ax0.streamplot(X, Y, U, V, color=U, linewidth=lw, cmap=plt.cm.autumn)
-strm = ax0.streamplot(X, Y, U, V, color=U, linewidth=lw, cmap=plt.cm.autumn)
-# fig0.colorbar(strm.lines)
+# # fig0.colorbar(strm.lines)
 
-# ax2.streamplot(X, Y, U, V, density=0.6, color='k', linewidth=lw)                                                     
+# # ax2.streamplot(X, Y, U, V, density=0.6, color='k', linewidth=lw)                                                     
 
-# plt.imshow(label_abs_SDM)
+# # plt.imshow(label_abs_SDM)
 
-plt.show()
+# plt.show()

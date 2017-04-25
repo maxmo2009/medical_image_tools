@@ -130,7 +130,7 @@ def PtToMap(i_p,size):
     i_m[int(round(x[1]))][int(round(x[0]))] = 1 #used to be i_m[x[1]][x[0]] = 1
     #i_m[y,x]!!!
   return i_m
-def PtOnMap(point,size):
+def PtOnMap(point,size): # single point on map
   i_m = np.zeros(size)
   i_m[int(round(point[1]))][int(round(point[0]))] = 1
   return i_m
@@ -368,7 +368,7 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
 
   return np.array(final_patch), np.array(final_vec)
 
-def get_limited_circle_gradient_SDMmap(label,ee=25):
+def get_limited_circle_gradient_SDMmap(label,ee=55):
   ssss = label.shape
   e = ee
   selem = disk(e)

@@ -32,8 +32,8 @@ idx_array = np.array(idx_array)
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
-label = np.load(data_p + '/data/miccai/label_set_2_3.npy').astype(np.int32)
-data = np.load(data_p +  '/data/miccai/data_set_2_3.npy').astype(np.float32)
+label = np.load(data_p + '/data/SCD/label_45.npy').astype(np.int32)
+data = np.load(data_p +  '/data/SCD/data_45.npy').astype(np.float32)
 
 # label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
 # data = np.load(data_p +  '/miccai_traindata/data_1.npy').astype(np.float32)
@@ -47,8 +47,8 @@ print data.shape
 # d_train = np.delete(data, [20],0)
 # l_train = np.delete(label, [20],0)
 
-d_train = data[:,:,:,0]
-l_train = label[:,:,:,0]
+d_train = data[idx_array,:,:,0]
+l_train = label[idx_array,:,:,0]
 
 
 print "The total number of training data after shrink is:"
@@ -72,8 +72,8 @@ for d,l in zip(d_train,l_train):
   print "current offset is:", it
   print d.shape
   print l.shape
-  
-  # SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l)
+
+
   dialited_label_mask = generate_mask(l,offset = 15)
   # SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train) #
   SDMmap_corp_gradient = get_limited_circle_gradient_SDMmap(l)# previous Single point norm map
@@ -113,8 +113,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/miccai_individual_patch_set_2_3.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
-np.save(data_p + '/train_data/miccai_individual_vecs_set_2_3.npy', f_v) 
+np.save(data_p + '/train_data/SCD_individual_patch_set_1_3.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
+np.save(data_p + '/train_data/SCD_individual_vecs_set_1_3.npy', f_v) 
 
 
 
