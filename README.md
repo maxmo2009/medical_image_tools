@@ -1,3 +1,4 @@
+
 Deep Active Contour
 ===
 1. Use med_data_gen.py to generate mini-patches as training data.
@@ -7,3 +8,4 @@ Deep Active Contour
 Dependencies:
 ====
 Numpy,Scipy,skimage,matplotlib,Tensorflow,Tensorlayer
+
