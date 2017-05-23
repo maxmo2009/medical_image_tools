@@ -11,11 +11,11 @@ from sklearn.utils import shuffle
 
 idx_array = []
 
-for x in range(0,15):
+for x in range(0,5):
   idx_array.append(x)
 
-for x in range(30,45):
-  idx_array.append(x)
+# for x in range(30,45):
+#   idx_array.append(x)
 
 idx_array = np.array(idx_array)
 
@@ -113,8 +113,8 @@ print f_v.shape
 
 
 
-np.save(data_p + '/train_data/SCD_individual_patch_set_1_3.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
-np.save(data_p + '/train_data/SCD_individual_vecs_set_1_3.npy', f_v) 
+np.save(data_p + '/train_data/SCD_individual_patch_set_5_addon.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
+np.save(data_p + '/train_data/SCD_individual_vecs_set_5_addon.npy', f_v)
 
 
 
