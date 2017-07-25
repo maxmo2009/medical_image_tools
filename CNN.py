@@ -21,11 +21,13 @@ import gridfs
 from datetime import datetime
 import sys
 
+'''
 client = MongoClient('146.169.33.34', 27020)
 db = client.AdvanceGan
 db.authenticate('xiaobai', 'xiaobai')
 uuid = datetime.utcnow()
 mfs = gridfs.GridFS(db, collection="MedicalCardcEvaluateImg")
+'''
 
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
@@ -134,7 +136,13 @@ train_step = tf.train.AdamOptimizer().minimize(qrdic)
 init=tf.initialize_all_variables()
 sess.run(init)
 
+load_params = tl.files.load_npz(name="model_addon.npz")
+tl.files.assign_params(sess, load_params, denseO)
+
+'''
 saver = tf.train.Saver()
+'''
+
 # regulizer
 # for p in denseO.all_params:
 #   qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
@@ -172,6 +180,7 @@ print elapsed_time
 #####################################################################################
 # ########################previous_gradient_single_point#############################
 '''
+'''
 infile = open("model_SCD.txt", 'r')
 models = list()
 for line in infile:
@@ -184,9 +193,11 @@ originpath = "/home/dsigpu5/Desktop/work_space/med_image_src"
 # saver.restore(sess, originpath + '/models/SCD_individual_1_2/final_DEEP_SNAKE_miccai_1_3')
 # saver.restore(sess, originpath + '/models/SCD_individual_2_3/final_DEEP_SNAKE_miccai')
 saver.restore(sess, originpath + models[modelid])
-outfile = open("results/SCD_CNN_vector_%1d.txt"%(modelid), 'w')
 print(originpath + models[modelid])
 # # ress = sess.run(denseO.outputs,feed_dict={xi:test_patches})
+'''
+
+outfile = open("results/NIPS17.txt", 'w')
 
 
 
@@ -209,7 +220,7 @@ npv = list()
 jaccard = list()
 dice = list()
 
-for idx in range(32, 33):
+for idx in range(6, 45):
 # for idx in range(modelid*15, modelid*15+15):
 # testlist = [24, 29]
 # for idx in testlist:
