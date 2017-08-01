@@ -10,22 +10,21 @@ data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 model_n = 'scd_addon'
 # 
 
-# with tf.device('/gpu:0'):
 
 
-# patches = np.load(data_p + '/train_data/patches_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
-# vecs = np.load(data_p + '/train_data/vecs_SDM_train_1_50_limitedCircle_preSin_shuffled.npy').astype(np.float32)
 
-patches = np.load(data_p + '/train_data/SCD_individual_patch_set_5_addon.npy').astype(np.float32)
-vecs = np.load(data_p + '/train_data/SCD_individual_vecs_set_5_addon.npy').astype(np.float32)
-# test_patches = np.load(data_p + '/train_data/patches_test.npy').astype(np.float32)
-# test_vecs = np.load(data_p + '/train_data/vecs_test.npy').astype(np.float32)
+
+patches = np.load(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_patch.npy').astype(np.float32)
+vecs = np.load(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_vecs.npy').astype(np.float32)
+
+
+print(patches.shape)
+print(vecs.shape)
+
 
 patches = patches[:,:,:,np.newaxis]
-# test_patches = test_patches[:,:,:,np.newaxis]
 
-# print patches.shape
-# print vecs.shape
+
 
 
 tf.set_random_seed(0)
@@ -95,13 +94,12 @@ denseO = tl.layers.DenseLayer(dense1,
                      name ='output'
                      )
 
-# print dense1.outputs
-# y = tf.nn.softmax
+
 
 sess=tf.InteractiveSession(config=tf.ConfigProto(log_device_placement=False))
 
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(denseO.outputs)))
-ce_with = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(denseO.outputs,y_))
+# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(denseO.outputs)))
+# ce_with = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(denseO.outputs,y_))
 qrdic = tf.reduce_sum(tf.square(y_ - denseO.outputs))
 
 train_step = tf.train.AdamOptimizer().minimize(qrdic)
@@ -109,9 +107,7 @@ init=tf.initialize_all_variables()
 sess.run(init)
 
 saver = tf.train.Saver()
-# regulizer
-# for p in denseO.all_params:
-#   qrdic = qrdic + tf.contrib.layers.l2_regularizer(0.001)(p)
+
 
 #################################################################################
 start_time = time.time()
@@ -128,8 +124,8 @@ for i in range(300):
     # print 'This is loss: ', los
   # if i%10 == 0:
 
-  print "EPOCH: " + str(i) + ":"
-  print "The total lose is:" + str(los)
+  print("EPOCH: " + str(i) + ":")
+  print("The total lose is:" + str(los))
   # if i%50 == 0:
   #   saver.save(sess, '../models/miccai_individual_1_3/temp/DEEP_SNAKE_' + model_n + '_at_' + str(los))
   # if los <= 0.5:
@@ -137,10 +133,10 @@ for i in range(300):
 
 
 # saver.save(sess, '../models/miccai_individual_1_3/final_DEEP_SNAKE_' + model_n)
-tl.files.save_npz(denseO.all_params , name='model_addon.npz')
+tl.files.save_npz(denseO.all_params , name='SCD_model_compressed.npz')
 elapsed_time = time.time() - start_time
-print "time last for: "
-print elapsed_time
+print("time last for: ")
+print(elapsed_time)
 
 
 #####################################################################################

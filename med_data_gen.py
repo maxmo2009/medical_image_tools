@@ -11,7 +11,7 @@ from sklearn.utils import shuffle
 
 idx_array = []
 
-for x in range(0,5):
+for x in range(0,30):
   idx_array.append(x)
 
 # for x in range(30,45):
@@ -21,13 +21,6 @@ idx_array = np.array(idx_array)
 
 
 
-# a = np.array([[0,0,1,0,0],
-# 	          [0,0,2,0,0],
-# 	          [0,0,3,0,0],
-# 	          [0,1,4,1,0],
-# 	          [0,0,5,0,0]])
-
-# a = np.delete(a, [0,2,4], 0)
 
 data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
@@ -37,8 +30,8 @@ data = np.load(data_p +  '/data/SCD/data_45.npy').astype(np.float32)
 
 # label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
 # data = np.load(data_p +  '/miccai_traindata/data_1.npy').astype(np.float32)
-print "The total number of training data is:"
-print data.shape
+print("The total number of training data is:")
+print(data.shape)
 
 # data,label = remove_empty_label(data,label)
 
@@ -51,27 +44,27 @@ d_train = data[idx_array,:,:,0]
 l_train = label[idx_array,:,:,0]
 
 
-print "The total number of training data after shrink is:"
-print data.shape
+print("The total number of training data after shrink is:")
+print(data.shape)
 
 
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
-print "---------TRAINING---------"
-print d_train.shape
-print l_train.shape
+print("---------PRODUCING---------")
+print(d_train.shape)
+print(l_train.shape)
 
 f_p = np.empty([1,64,64])
 f_v = np.empty([1,2])
 
-print "--------ENDS---------"
+
 it = 0
-print "--------start generating patches------"
+print("--------start generating patches------")
 for d,l in zip(d_train,l_train):
-  print "current offset is:", it
-  print d.shape
-  print l.shape
+  print("current offset is:", it)
+  print(d.shape)
+  print(l.shape)
 
 
   dialited_label_mask = generate_mask(l,offset = 15)
@@ -92,8 +85,8 @@ for d,l in zip(d_train,l_train):
   f_p = np.append(f_p,train_patch,axis = 0)
   f_v = np.append(f_v,train_vecs,axis = 0)
   it = it + 1
-print f_p.shape
-print f_v.shape
+print(f_p.shape)
+print(f_v.shape)
   
 
 # plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
@@ -107,14 +100,14 @@ f_p = np.delete(f_p,[0],0)
 
 f_v = np.delete(f_v,[0],0)
 
-print f_p.shape
-print f_v.shape
+print(f_p.shape)
+print(f_v.shape)
 
 
 
 
-np.save(data_p + '/train_data/SCD_individual_patch_set_5_addon.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
-np.save(data_p + '/train_data/SCD_individual_vecs_set_5_addon.npy', f_v)
+np.save(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_patch.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
+np.save(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_vecs.npy', f_v)
 
 
 

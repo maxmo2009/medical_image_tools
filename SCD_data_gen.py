@@ -27,9 +27,9 @@ def compare_ident(A,B):
     a = a.split('.', 1)[0]
     b = b.split('.', 1)[0]
     if a == b:
-      print 1
+      print(1)
     else:
-      print a,b
+      print(a,b)
 
 def pick_corr(imagep,B):
   imagep = imagep.split('.', 1)[0]
