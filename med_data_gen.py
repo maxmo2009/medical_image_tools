@@ -6,52 +6,88 @@ from skimage.morphology import erosion, dilation, opening, closing, white_tophat
 from skimage.morphology import disk
 from scipy import ndimage
 import math
+from sklearn.utils import shuffle
+
+
+idx_array = []
+
+for x in range(0,30):
+  idx_array.append(x)
+
+# for x in range(30,45):
+#   idx_array.append(x)
+
+idx_array = np.array(idx_array)
 
 
 
-# a = np.array([[0,0,1,0,0],
-# 	          [0,0,2,0,0],
-# 	          [0,0,3,0,0],
-# 	          [0,1,4,1,0],
-# 	          [0,0,5,0,0]])
 
-# a = np.delete(a, [0,2,4], 0)
+data_p = '/media/dsigpu5/SSD/YUANHAN/data'
 
 
+label = np.load(data_p + '/data/SCD/label_45.npy').astype(np.int32)
+data = np.load(data_p +  '/data/SCD/data_45.npy').astype(np.float32)
+
+# label = np.load(data_p + '/miccai_traindata/label_1.npy').astype(np.int32)
+# data = np.load(data_p +  '/miccai_traindata/data_1.npy').astype(np.float32)
+print("The total number of training data is:")
+print(data.shape)
+
+# data,label = remove_empty_label(data,label)
+
+# data,label = shuffle(data,label,random_state=1)
+
+# d_train = np.delete(data, [20],0)
+# l_train = np.delete(label, [20],0)
+
+d_train = data[idx_array,:,:,0]
+l_train = label[idx_array,:,:,0]
 
 
-label = np.load('../data/labels.npy').astype(np.int32)
-data = np.load('../data/datas.npy').astype(np.float32)
-print "The total number of training data is:"
-print data.shape
-
-data,label = remove_empty_label(data,label)
-print data.shape
+print("The total number of training data after shrink is:")
+print(data.shape)
 
 
-
-d_train = data[6,:,:,0]
-l_train = label[6,:,:,0]
 
 # d_test = data[11,:,:,0]
 # l_test = label[11,:,:,0]
- 
-print d_train.shape
-print l_train.shape
+print("---------PRODUCING---------")
+print(d_train.shape)
+print(l_train.shape)
+
+f_p = np.empty([1,64,64])
+f_v = np.empty([1,2])
 
 
-SDMmap_corp_norm_train, SDM_vec_train = get_SDMmap(l_train)
-dialited_label_mask = generate_mask(l_train,offset = 15)
-SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train)
-SDMmap_vec_gradient = get_gradient_SDMmap(SDM_vec_train)
+it = 0
+print("--------start generating patches------")
+for d,l in zip(d_train,l_train):
+  print("current offset is:", it)
+  print(d.shape)
+  print(l.shape)
+
+
+  dialited_label_mask = generate_mask(l,offset = 15)
+  # SDMmap_corp_gradient = get_gradient_SDMmap(SDMmap_corp_norm_train) #
+  SDMmap_corp_gradient = get_limited_circle_gradient_SDMmap(l)# previous Single point norm map
+  SDMmap_vec_gradient = get_limited_circle_gradient_SDMmap(l)
+  
 
 # plt.imshow(SDMmap_gradient,cmap = 'gray',interpolation = 'nearest')
 # plt.show()
 
-points_list =  iterate_mask(dialited_label_mask)
-test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
+
+  points_list =  iterate_mask(dialited_label_mask)
+
+  train_patch, train_vecs = corp_accdTo_mask(d,SDMmap_corp_gradient,SDMmap_vec_gradient,points_list) # negatative Y toward norm!!!!!!!
 
 
+  f_p = np.append(f_p,train_patch,axis = 0)
+  f_v = np.append(f_v,train_vecs,axis = 0)
+  it = it + 1
+print(f_p.shape)
+print(f_v.shape)
+  
 
 # plt.imshow(test_patch[101,:,:],cmap = 'gray',interpolation = 'nearest')
 # plt.show()
@@ -60,9 +96,20 @@ test_patch, test_vecs = corp_accdTo_mask(d_train,SDMmap_corp_gradient,SDMmap_vec
 # print test_patch.shape
 # print test_vecs.shape
 
+f_p = np.delete(f_p,[0],0)
 
-np.save('../data/patches_SDM_train.npy', test_patch)
-np.save('../data/vecs_SDM_train.npy', test_vecs)
+f_v = np.delete(f_v,[0],0)
+
+print(f_p.shape)
+print(f_v.shape)
+
+
+
+
+np.save(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_patch.npy', f_p) #1 = [0:15] 2= [15:30] 3=[30:45]
+np.save(data_p + '/train_data/TMI/SCD_indvidual_0_30_compressed_vecs.npy', f_v)
+
+
 
 
 

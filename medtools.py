@@ -16,10 +16,12 @@ from math import *
 from scipy import ndimage
 from skimage import measure
 import skfmm
-
+from sklearn.utils import shuffle
 # from scipy.interpolate import splprep, splev
 from scipy.interpolate import splprep, splev
 patch_size = 32 #pathcsize * 2
+
+
 
 
 def length(v):
@@ -71,8 +73,10 @@ def corp(ar,angle,x,y,w=32): # ar = input image, w = patch size
 
 
 
-def generate_psedu_points(label,k = 20):
-  e = 15 
+
+def generate_psedu_points(label,k = 15,ee = 10): #ee: how far is going to dialiated. k: distance between each point
+
+  e = ee
   selem = disk(e)
   dilated_label = dilation(label, selem)
   dd_label = ndimage.binary_fill_holes(dilated_label).astype(int)
@@ -83,7 +87,7 @@ def generate_psedu_points(label,k = 20):
   
   p_l[:,[0,1]] = p_l[:,[1,0]]
 
-  print p_l
+  # print p_l
 
   keep_index_train = []
   for i in range(0,len(p_l),k):
@@ -91,15 +95,23 @@ def generate_psedu_points(label,k = 20):
   p_l = p_l[keep_index_train]
   return p_l
 
+def fill_holes(array):
+  l = []
+  for i in range(len(array)):
+    image_c = array[i]
+    image = image_c[:,:,0]
+    image = ndimage.binary_fill_holes(image).astype(int)
+    l.append(image)
+  return np.array(l)
 
-def rotate_vector(vec,an):#take degree(0-360) not radis(0-2pi), rotate single vector
+def rotate_vector(vec,an):#take degree(0-360) not radis(0-2pi), rotate single vector (x,y)
 
   ang = pi * an / 180
   x = vec[0]*cos(ang) - vec[1]*sin(ang)
   y = vec[0]*sin(ang) + vec[1]*cos(ang)
   return (x,y)
 
-def rotate_vectors_list(vecs,an):#take degree(0-360) not radis(0-2pi), rotate a vecs list with an angel list
+def rotate_vectors_list(vecs,an):#take degree(0-360) not radis(0-2pi), rotate a vecs list with an angel list!!!
 
   new_l = []
   for i,j in zip(vecs,an):
@@ -123,10 +135,13 @@ def generator_ponits_c(raw,k,xx = 128,yy = 128,r = 70):
 def PtToMap(i_p,size):
   i_m = np.zeros(size)
   for x in i_p:
-    i_m[x[1]][x[0]] = 1 #used to be i_m[x[1]][x[0]] = 1
+    i_m[int(round(x[1]))][int(round(x[0]))] = 1 #used to be i_m[x[1]][x[0]] = 1
     #i_m[y,x]!!!
   return i_m
-
+def PtOnMap(point,size): # single point on map
+  i_m = np.zeros(size)
+  i_m[int(round(point[1]))][int(round(point[0]))] = 1
+  return i_m
 
 def get_norm_T(points):
   ox = 128
@@ -155,7 +170,11 @@ def get_vecF_from_label_abs(points,label): #less accuracy
     jj = jj + 1
   return v_l
 
-
+def get_trajectory_first_derivitive(points):
+  pt = np.array(points)
+  tck, u = splprep(pt.T, u=None, s=0.0, per=1) 
+  D1_mash = np.linspace(u.min(), u.max(), 1000)
+  pass
 
 
 def get_norm_by_spline_first_derivitive(points,angle =True):
@@ -168,12 +187,12 @@ def get_norm_by_spline_first_derivitive(points,angle =True):
 
   D1_mash = np.linspace(u.min(), u.max(), 1000)
   xy = splev(u, tck, der=1) #produce dy and dx
-  xy = np.array(xy).T
+  xy_T = np.array(xy).T
 
   norm_out = []
   norm_in = []
   
-  for item in xy:
+  for item in xy_T:
 
     norm_out.append(l2_norm((item[1],-item[0])))
     norm_in.append(l2_norm((-item[1],item[0])))
@@ -185,6 +204,9 @@ def normListToAngelList(norm):
   for item in norm:
     an_l.append(angle_clockwise(item))
   return an_l
+
+def normToAngel(norm):
+  return angle_clockwise(norm)
 
 def get_vecF_from_label_relative(points,label,ang):
 
@@ -220,12 +242,17 @@ def get_vecF_from_label_relative(points,label,ang):
 def l2_norm(vec):
   dx,dy = vec
   mag = np.linalg.norm(vec)
+  if mag == 0.0:
+    return (1,0)
   return (dx/mag,dy/mag)
+
+def l2_norm_list(vec_list): 
+  pass
 
 def mean_distance(vec_1,vec_2): #inputs are two vectors lists
   dis_l = []
   if vec_1.shape != vec_2.shape:
-    print "vectors's shape mush be equal"
+    print("vectors's shape mush be equal")
     return
   for i,j in zip(vec_1,vec_2):
     dis = (i[0] - j[0]) + (i[1] - j[1])**2
@@ -290,14 +317,15 @@ def scale_SDMmap_gradient(SDM_gradient, scale_matrix):
 
   xx,yy,zz = SDM_gradient.shape
   if x != xx or y != yy:
-    print "function() scale_SDMmap_gradient shape not equal"
+    print("function() scale_SDMmap_gradient shape not equal")
 
-def iterate_mask(mask):
+def iterate_mask(mask,random = 0.2):
   points_list = []
   for i in range(len(mask)):#iterate over Y row
     for j in range(len(mask[i])):#iterate over X 
       if mask[i][j] == 1:
-        points_list.append((j,i))
+        if np.random.uniform(0,1) <= random:
+          points_list.append((j,i))
   return points_list
 
 
@@ -325,10 +353,10 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   final_patch = []
   final_vec = []
   dev_list = [-45,0,45]
-  print "the length of the mask_point_list is " + str(len(mask_point_list))
+  print("the length of the mask_point_list is " + str(len(mask_point_list)))
   i = 0
   for cord in mask_point_list: #cord = (x,y)
-    print i
+    # print i
     i = i + 1
     x,y = cord
     dx = SDMmap_grad[y][x][0]
@@ -348,6 +376,49 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
 
 
   return np.array(final_patch), np.array(final_vec)
+
+def get_limited_circle_gradient_SDMmap(label,ee=55):
+  ssss = label.shape
+  e = ee
+  selem = disk(e)
+  filled_label = ndimage.binary_fill_holes(label).astype(int)
+  contours_label = measure.find_contours(filled_label, 0.8)
+ 
+  p_l = np.array(contours_label)
+  print("Contour's shape is",p_l.shape)
+  p_l = p_l[0,:,:]
+
+  p_l[:,[0,1]] = p_l[:,[1,0]] # rotate
+
+  mask_label_contour = dilation(PtToMap(p_l,ssss), selem) ## size
+
+  inner_mask = mask_label_contour*filled_label
+  out_mask =  mask_label_contour - inner_mask
+  label_SDM, label_abs_SDM = get_SDMmap(label)
+  gradient = get_gradient_SDMmap(label_abs_SDM)
+  scale_label_abs_SDM = (mask_label_contour*label_abs_SDM)/(mask_label_contour*label_abs_SDM).max()
+
+  for i in range(len(out_mask)):#iterate over Y row
+    for j in range(len(out_mask[i])):#iterate over X 
+      if out_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  for i in range(len(inner_mask)):#iterate over Y row
+    for j in range(len(inner_mask[i])):#iterate over X 
+      if inner_mask[i,j] == 1:
+        scale = scale_label_abs_SDM[i][j]
+        scale_deg = (1-scale)*-90.0
+        y = gradient[i,j,1]
+        x = gradient[i,j,0]
+        rotated_xy = rotate_vector((x,y),scale_deg)
+        gradient[i,j,1] = rotated_xy[1]
+        gradient[i,j,0] = rotated_xy[0]
+  return gradient
 
 
 
