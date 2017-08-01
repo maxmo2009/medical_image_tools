@@ -257,7 +257,7 @@ def l2_norm_list(vec_list):
 def mean_distance(vec_1,vec_2): #inputs are two vectors lists
   dis_l = []
   if vec_1.shape != vec_2.shape:
-    print "vectors's shape mush be equal"
+    print ("vectors's shape mush be equal")
     return
   for i,j in zip(vec_1,vec_2):
     dis = (i[0] - j[0]) + (i[1] - j[1])**2
@@ -322,7 +322,7 @@ def scale_SDMmap_gradient(SDM_gradient, scale_matrix):
 
   xx,yy,zz = SDM_gradient.shape
   if x != xx or y != yy:
-    print "function() scale_SDMmap_gradient shape not equal"
+    print ("function() scale_SDMmap_gradient shape not equal")
 
 def iterate_mask(mask):
   points_list = []
@@ -357,7 +357,7 @@ def corp_accdTo_mask(img,SDMmap_grad,SDM_vec_grad,mask_point_list):
   final_patch = []
   final_vec = []
   dev_list = [-45,0,45]
-  print "the length of the mask_point_list is " + str(len(mask_point_list))
+  print ("the length of the mask_point_list is " + str(len(mask_point_list)))
   i = 0
   for cord in mask_point_list: #cord = (x,y)
     # print i
@@ -418,7 +418,7 @@ def get_limited_circle_gradient_SDMmap(label,ee=25):
   label_SDM, label_abs_SDM = get_SDMmap(label)
   gradient = get_gradient_SDMmap(label_abs_SDM)
   scale_label_abs_SDM = (mask_label_contour*label_abs_SDM)/(mask_label_contour*label_abs_SDM).max()
-  print label_abs_SDM.max()
+  print (label_abs_SDM.max())
   for i in range(len(out_mask)):#iterate over Y row
     for j in range(len(out_mask[i])):#iterate over X
       if out_mask[i,j] == 1:
